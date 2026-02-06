@@ -1,7 +1,7 @@
-import Home from "./pages/Home";
+import MerchantRegister from "./pages/MerchantRegister";
 
 function App() {
-  return <Home />;
+  return <MerchantRegister />;
 }
 
 export default App;
