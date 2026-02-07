@@ -7,17 +7,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MerchantRegisterRequest {
-
-    @NotBlank
-    private String name;
+public class MerchantLoginRequest {
 
     @Email
+    @NotBlank
     private String email;
 
     @NotBlank
     private String password;
-
-    @NotBlank
-    private String businessName;
 }

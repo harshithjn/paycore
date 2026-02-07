@@ -1,12 +1,10 @@
 import { useState } from "react";
 import api from "../api/axios";
 
-const MerchantRegister = () => {
+const MerchantLogin = () => {
   const [form, setForm] = useState({
-    name: "",
     email: "",
     password: "",
-    businessName: "",
   });
 
   const [message, setMessage] = useState("");
@@ -15,24 +13,22 @@ const MerchantRegister = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const register = async () => {
+  const login = async () => {
     try {
-      const res = await api.post("/merchant/register", form);
-      setMessage(res.data.message);
-    } catch {
-      setMessage("Registration failed");
+      const res = await api.post("/merchant/login", form);
+      setMessage("Login successful! Merchant ID: " + res.data.merchantId);
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.message) {
+         setMessage("Login failed: " + error.response.data.message);
+      } else {
+         setMessage("Login failed");
+      }
     }
   };
 
   return (
     <div style={{ padding: "40px" }}>
-      <h2>Merchant Registration</h2>
-
-      <input
-        name="name"
-        placeholder="Name"
-        onChange={handleChange}
-      /><br />
+      <h2>Merchant Login</h2>
 
       <input
         name="email"
@@ -47,17 +43,11 @@ const MerchantRegister = () => {
         onChange={handleChange}
       /><br />
 
-      <input
-        name="businessName"
-        placeholder="Business Name"
-        onChange={handleChange}
-      /><br />
-
-      <button onClick={register}>Register</button>
+      <button onClick={login}>Login</button>
 
       <p>{message}</p>
     </div>
   );
 };
 
-export default MerchantRegister;
+export default MerchantLogin;

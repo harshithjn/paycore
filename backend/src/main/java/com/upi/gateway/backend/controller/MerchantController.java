@@ -1,5 +1,7 @@
 package com.upi.gateway.backend.controller;
 
+import com.upi.gateway.backend.dto.MerchantLoginRequest;
+import com.upi.gateway.backend.dto.MerchantLoginResponse;
 import com.upi.gateway.backend.dto.MerchantRegisterRequest;
 import com.upi.gateway.backend.dto.MerchantRegisterResponse;
 import com.upi.gateway.backend.model.Merchant;
@@ -24,5 +26,10 @@ public class MerchantController {
         return new MerchantRegisterResponse(
                 merchant.getId(),
                 "Merchant registered successfully");
+    }
+
+    @PostMapping("/login")
+    public MerchantLoginResponse login(@Valid @RequestBody MerchantLoginRequest request) {
+        return merchantService.login(request);
     }
 }
