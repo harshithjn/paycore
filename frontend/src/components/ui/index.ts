@@ -3,3 +3,5 @@ export { Button } from './Button';
 export { StatusBadge } from './StatusBadge';
 export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from './Table';
 export { Modal } from './Modal';
+export { Toast, useToast } from './Toast';
+export { LoadingSpinner } from './LoadingSpinner';

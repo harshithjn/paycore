@@ -1,16 +1,36 @@
 export interface Transaction {
   id: string;
+  merchant_id: number;
   amount: number;
-  status: 'success' | 'failed' | 'pending' | 'processing' | 'created';
+  status: 'CREATED' | 'INITIATED' | 'PROCESSING' | 'SUCCESS' | 'FAILED';
+  payment_method: string;
+  merchant_transaction_id?: string;
+  customer_email?: string;
+  customer_phone?: string;
+  created_at: string;
+  updated_at: string;
+  upi_transaction_id?: string;
+  failure_reason?: string;
+}
+
+export interface PaymentInitiateRequest {
+  merchantId: number;
+  amount: number;
   paymentMethod: string;
-  merchantTransactionId: string;
+  merchantTransactionId?: string;
   customerEmail?: string;
   customerPhone?: string;
+}
+
+export interface PaymentInitiateResponse {
+  transactionId: string;
+  merchantId: number;
+  amount: number;
+  paymentMethod: string;
+  status: string;
+  message: string;
   createdAt: string;
-  updatedAt: string;
-  callbackSent: boolean;
-  upiTransactionId?: string;
-  failureReason?: string;
+  merchantTransactionId?: string;
 }
 
 export interface Payment {

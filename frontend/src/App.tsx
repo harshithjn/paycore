@@ -9,6 +9,7 @@ import { Settlements } from './pages/Settlements';
 import { Reports } from './pages/Reports';
 import { ApiKeys } from './pages/ApiKeys';
 import { Settings } from './pages/Settings';
+import { PaymentInitiation } from './pages/PaymentInitiation';
 
 function App() {
   return (
@@ -17,6 +18,9 @@ function App() {
         <Routes>
           {/* Redirect root to default merchant dashboard */}
           <Route path="/" element={<Navigate to="/merchant/1/dashboard" replace />} />
+          
+          {/* Standalone Payment Initiation Page */}
+          <Route path="/merchant/:merchantId/payment-initiation" element={<PaymentInitiation />} />
           
           {/* Merchant routes */}
           <Route path="/merchant/:merchantId" element={<DashboardLayout />}>
