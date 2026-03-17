@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { PaymentService } from './services/PaymentService.js';
+import { VerificationService } from './services/VerificationService.js';
 
 dotenv.config();
 
@@ -12,10 +13,11 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Initialize payment service
+// Initialize services
 const paymentService = new PaymentService();
+const verificationService = new VerificationService();
 
-// Routes
+// Payment routes
 app.post('/api/payment/initiate', async (req, res) => {
     try {
         console.log('Received payment initiation request:', req.body);
@@ -61,6 +63,62 @@ app.get('/api/payment/methods', async (req, res) => {
     }
 });
 
+// Verification routes
+app.get('/api/verification/status', async (req, res) => {
+    try {
+        const { id } = req.query;
+        if (!id) {
+            return res.status(400).json({ error: 'Transaction ID is required' });
+        }
+
+        const statusData = await verificationService.getTransactionStatus(id);
+        res.json(statusData);
+    } catch (error) {
+        console.error('Error fetching verification status:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/verification/verify', async (req, res) => {
+    try {
+        const { transactionId } = req.body;
+        if (!transactionId) {
+            return res.status(400).json({ error: 'Transaction ID is required' });
+        }
+
+        const verificationResult = await verificationService.verifyTransaction(transactionId);
+        res.json(verificationResult);
+    } catch (error) {
+        console.error('Error verifying transaction:', error);
+        res.status(400).json({ error: error.message });
+    }
+});
+
+app.get('/api/verification/merchant/:merchantId/transactions', async (req, res) => {
+    try {
+        const merchantId = parseInt(req.params.merchantId);
+        const filters = {
+            status: req.query.status,
+            payment_method: req.query.payment_method,
+            from_date: req.query.from_date,
+            to_date: req.query.to_date
+        };
+
+        // Remove undefined filters
+        Object.keys(filters).forEach(key => {
+            if (filters[key] === undefined) {
+                delete filters[key];
+            }
+        });
+
+        const transactions = await verificationService.getMerchantTransactions(merchantId, filters);
+        res.json(transactions);
+    } catch (error) {
+        console.error('Error fetching merchant transactions:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 // Health check
 app.get('/health', (req, res) => {
     res.json({ status: 'OK', timestamp: new Date().toISOString() });
@@ -73,5 +131,8 @@ app.listen(port, () => {
     console.log(`  GET  /api/payment/status/:transactionId`);
     console.log(`  GET  /api/payment/merchant/:merchantId/transactions`);
     console.log(`  GET  /api/payment/methods`);
+    console.log(`  GET  /api/verification/status?id=txn_id`);
+    console.log(`  POST /api/verification/verify`);
+    console.log(`  GET  /api/verification/merchant/:merchantId/transactions`);
     console.log(`  GET  /health`);
 });

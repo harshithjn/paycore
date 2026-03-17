@@ -10,6 +10,7 @@ import { Reports } from './pages/Reports';
 import { ApiKeys } from './pages/ApiKeys';
 import { Settings } from './pages/Settings';
 import { PaymentInitiation } from './pages/PaymentInitiation';
+import { TransactionVerification } from './pages/TransactionVerification';
 
 function App() {
   return (
@@ -19,8 +20,9 @@ function App() {
           {/* Redirect root to default merchant dashboard */}
           <Route path="/" element={<Navigate to="/merchant/1/dashboard" replace />} />
           
-          {/* Standalone Payment Initiation Page */}
+          {/* Standalone Pages */}
           <Route path="/merchant/:merchantId/payment-initiation" element={<PaymentInitiation />} />
+          <Route path="/merchant/:merchantId/verification" element={<TransactionVerification />} />
           
           {/* Merchant routes */}
           <Route path="/merchant/:merchantId" element={<DashboardLayout />}>

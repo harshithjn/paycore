@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '../../utils/cn';
 
-export type Status = 'success' | 'pending' | 'failed' | 'processing' | 'created' | 'refunded' | 'settled' | 'SUCCESS' | 'FAILED' | 'PROCESSING' | 'CREATED' | 'INITIATED';
+export type Status = 'success' | 'pending' | 'failed' | 'processing' | 'created' | 'refunded' | 'settled' | 'SUCCESS' | 'FAILED' | 'PROCESSING' | 'CREATED' | 'INITIATED' | 'REFUNDED' | 'SETTLED';
 
 interface StatusBadgeProps {
   status: Status;
@@ -21,7 +21,9 @@ const statusConfig = {
   FAILED: { label: 'Failed', className: 'status-failed' },
   PROCESSING: { label: 'Processing', className: 'status-processing' },
   CREATED: { label: 'Created', className: 'status-pending' },
-  INITIATED: { label: 'Initiated', className: 'status-processing' }
+  INITIATED: { label: 'Initiated', className: 'status-processing' },
+  REFUNDED: { label: 'Refunded', className: 'status-success' },
+  SETTLED: { label: 'Settled', className: 'status-success' }
 };
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, className }) => {
