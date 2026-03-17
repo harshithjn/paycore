@@ -1,19 +1,42 @@
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import MerchantRegister from "./pages/MerchantRegister";
-import MerchantLogin from "./pages/MerchantLogin";
+
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { DashboardLayout } from './components/layout/DashboardLayout';
+import { Dashboard } from './pages/Dashboard';
+import { Transactions } from './pages/Transactions';
+import { Payments } from './pages/Payments';
+import { Refunds } from './pages/Refunds';
+import { Settlements } from './pages/Settlements';
+import { Reports } from './pages/Reports';
+import { ApiKeys } from './pages/ApiKeys';
+import { Settings } from './pages/Settings';
 
 function App() {
   return (
     <Router>
-      <nav style={{ padding: "20px", borderBottom: "1px solid #ccc" }}>
-        <Link to="/register" style={{ marginRight: "10px" }}>Register</Link>
-        <Link to="/login">Login</Link>
-      </nav>
-      <Routes>
-        <Route path="/register" element={<MerchantRegister />} />
-        <Route path="/login" element={<MerchantLogin />} />
-        <Route path="/" element={<MerchantLogin />} />
-      </Routes>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Routes>
+          {/* Redirect root to default merchant dashboard */}
+          <Route path="/" element={<Navigate to="/merchant/1/dashboard" replace />} />
+          
+          {/* Merchant routes */}
+          <Route path="/merchant/:merchantId" element={<DashboardLayout />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="transactions" element={<Transactions />} />
+            <Route path="payments" element={<Payments />} />
+            <Route path="refunds" element={<Refunds />} />
+            <Route path="settlements" element={<Settlements />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="api-keys" element={<ApiKeys />} />
+            <Route path="settings" element={<Settings />} />
+            
+            {/* Default redirect to dashboard */}
+            <Route index element={<Navigate to="dashboard" replace />} />
+          </Route>
+          
+          {/* Catch all route */}
+          <Route path="*" element={<Navigate to="/merchant/1/dashboard" replace />} />
+        </Routes>
+      </div>
     </Router>
   );
 }
