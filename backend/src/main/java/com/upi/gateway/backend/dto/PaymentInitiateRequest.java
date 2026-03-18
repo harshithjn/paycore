@@ -23,4 +23,5 @@ public class PaymentInitiateRequest {
     private String merchantTransactionId;
     private String customerEmail;
     private String customerPhone;
+    private String callbackUrl;
 }

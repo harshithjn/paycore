@@ -5,6 +5,8 @@ import com.upi.gateway.backend.dto.PaymentInitiateResponse;
 import com.upi.gateway.backend.dto.TransactionStatusResponse;
 import com.upi.gateway.backend.factory.PaymentProcessorFactory;
 import com.upi.gateway.backend.model.Transaction;
+import com.upi.gateway.backend.observer.TransactionObserver;
+import com.upi.gateway.backend.observer.TransactionSubject;
 import com.upi.gateway.backend.repository.TransactionRepository;
 import com.upi.gateway.backend.strategy.PaymentProcessor;
 import com.upi.gateway.backend.strategy.PaymentResult;
@@ -13,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,10 +23,37 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PaymentService {
+public class PaymentService implements TransactionSubject {
     
     private final TransactionRepository transactionRepository;
     private final PaymentProcessorFactory processorFactory;
+    private final List<TransactionObserver> observers = new ArrayList<>();
+    
+    @Override
+    public void registerObserver(TransactionObserver observer) {
+        observers.add(observer);
+        log.info("Registered observer: {}", observer.getType());
+    }
+    
+    @Override
+    public void removeObserver(TransactionObserver observer) {
+        observers.remove(observer);
+        log.info("Removed observer: {}", observer.getType());
+    }
+    
+    @Override
+    public void notifyObservers(Transaction transaction) {
+        log.info("Notifying {} observers for transaction {} with status {}", 
+                observers.size(), transaction.getId(), transaction.getStatus());
+        
+        for (TransactionObserver observer : observers) {
+            try {
+                observer.update(transaction);
+            } catch (Exception e) {
+                log.error("Error notifying observer {}: {}", observer.getType(), e.getMessage(), e);
+            }
+        }
+    }
     
     @Transactional
     public PaymentInitiateResponse initiatePayment(PaymentInitiateRequest request) {
@@ -45,14 +75,21 @@ public class PaymentService {
                 .merchantTransactionId(request.getMerchantTransactionId())
                 .customerEmail(request.getCustomerEmail())
                 .customerPhone(request.getCustomerPhone())
+                .callbackUrl(request.getCallbackUrl())
                 .build();
         
         transaction = transactionRepository.save(transaction);
         log.info("Created transaction with ID: {}", transaction.getId());
         
+        // Notify observers about CREATED status
+        notifyObservers(transaction);
+        
         // Update status to INITIATED
         transaction.setStatus(Transaction.TransactionStatus.INITIATED);
         transaction = transactionRepository.save(transaction);
+        
+        // Notify observers about INITIATED status
+        notifyObservers(transaction);
         
         // Process payment asynchronously
         PaymentProcessor processor = processorOpt.get();
@@ -64,15 +101,19 @@ public class PaymentService {
     private void processPaymentAsync(Transaction transaction, PaymentProcessor processor) {
         // Update status to PROCESSING
         transaction.setStatus(Transaction.TransactionStatus.PROCESSING);
-        transactionRepository.save(transaction);
+        final Transaction savedTransaction = transactionRepository.save(transaction);
+        
+        // Notify observers about PROCESSING status
+        notifyObservers(savedTransaction);
         
         // Process payment
-        processor.process(transaction)
-                .thenAccept(result -> updateTransactionResult(transaction.getId(), result))
+        final UUID transactionId = savedTransaction.getId();
+        processor.process(savedTransaction)
+                .thenAccept(result -> updateTransactionResult(transactionId, result))
                 .exceptionally(throwable -> {
-                    log.error("Payment processing failed for transaction: {}", transaction.getId(), throwable);
+                    log.error("Payment processing failed for transaction: {}", transactionId, throwable);
                     PaymentResult failureResult = PaymentResult.failure("Processing error: " + throwable.getMessage());
-                    updateTransactionResult(transaction.getId(), failureResult);
+                    updateTransactionResult(transactionId, failureResult);
                     return null;
                 });
     }
@@ -92,8 +133,11 @@ public class PaymentService {
                 transaction.setFailureReason(result.getFailureReason());
             }
             
-            transactionRepository.save(transaction);
+            transaction = transactionRepository.save(transaction);
             log.info("Updated transaction {} with status: {}", transactionId, result.getStatus());
+            
+            // Notify observers about final status (SUCCESS/FAILED)
+            notifyObservers(transaction);
         }
     }
     

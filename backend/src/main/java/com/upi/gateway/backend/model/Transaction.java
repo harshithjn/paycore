@@ -52,6 +52,20 @@ public class Transaction {
     @Column(name = "upi_transaction_id")
     private String upiTransactionId;
     
+    @Column(name = "callback_url")
+    private String callbackUrl;
+    
+    @Column(name = "callback_sent")
+    @Builder.Default
+    private Boolean callbackSent = false;
+    
+    @Column(name = "verification_attempts")
+    @Builder.Default
+    private Integer verificationAttempts = 0;
+    
+    @Column(name = "last_verified_at")
+    private LocalDateTime lastVerifiedAt;
+    
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -61,6 +75,6 @@ public class Transaction {
     private LocalDateTime updatedAt;
     
     public enum TransactionStatus {
-        CREATED, INITIATED, PROCESSING, SUCCESS, FAILED
+        CREATED, INITIATED, PROCESSING, SUCCESS, FAILED, REFUNDED, SETTLED
     }
 }
