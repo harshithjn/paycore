@@ -1,6 +1,8 @@
 package com.upi.gateway.backend.repository;
 
 import com.upi.gateway.backend.model.Transaction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,7 +16,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     
     List<Transaction> findByMerchantIdOrderByCreatedAtDesc(Long merchantId);
     
+    Page<Transaction> findByMerchantIdOrderByCreatedAtDesc(Long merchantId, Pageable pageable);
+    
     List<Transaction> findByMerchantIdAndStatusOrderByCreatedAtDesc(Long merchantId, Transaction.TransactionStatus status);
+    
+    Page<Transaction> findByMerchantIdAndStatusOrderByCreatedAtDesc(Long merchantId, Transaction.TransactionStatus status, Pageable pageable);
     
     @Query("SELECT t FROM Transaction t WHERE t.merchantId = :merchantId AND t.status IN :statuses ORDER BY t.createdAt DESC")
     List<Transaction> findByMerchantIdAndStatusInOrderByCreatedAtDesc(

@@ -67,6 +67,7 @@ export interface PaymentInitiateRequest {
   merchantTransactionId?: string;
   customerEmail?: string;
   customerPhone?: string;
+  callbackUrl?: string;
 }
 
 export interface PaymentInitiateResponse {
