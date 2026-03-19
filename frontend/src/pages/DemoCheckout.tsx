@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { CreditCard, Smartphone, ShieldCheck, CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
 import { paymentApi } from '../api/paymentApi';
+import { apiFetch } from '../lib/api';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 
 export const DemoCheckout: React.FC = () => {
@@ -42,9 +43,8 @@ export const DemoCheckout: React.FC = () => {
 
     try {
       // Direct API call to update status on backend
-      await fetch(`http://localhost:8081/api/transaction/${transactionId}/status`, {
+      await apiFetch(`/api/transaction/${transactionId}/status`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus, failureReason })
       });
       setStatus(newStatus.toLowerCase() as any);

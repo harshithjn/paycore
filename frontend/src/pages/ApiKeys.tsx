@@ -119,8 +119,8 @@ export const ApiKeys = () => {
                       <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Create Payment Link</span>
                       <span className="text-[10px] text-[#6B7280] font-mono">POST /api/v1/payment-links</span>
                    </div>
-                   <pre className="text-xs text-[#34D399] font-mono overflow-x-auto p-4 bg-[#1A1A1A] rounded-xl border border-[#2A2A2A]">
-{`curl -X POST http://localhost:8081/api/v1/payment-links \\
+                  <pre className="text-xs text-[#34D399] font-mono overflow-x-auto p-4 bg-[#1A1A1A] rounded-xl border border-[#2A2A2A]">
+{`curl -X POST https://api.paycore.harshithj.me/api/v1/payment-links \\
   -H "X-Api-Key: YOUR_SECRET_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -138,7 +138,7 @@ export const ApiKeys = () => {
                    </div>
                    <pre className="text-xs text-[#34D399] font-mono overflow-x-auto p-4 bg-[#1A1A1A] rounded-xl border border-[#2A2A2A]">
 {`curl -H "X-Api-Key: YOUR_SECRET_KEY" \\
-  http://localhost:8081/api/v1/payment-links`}
+  https://api.paycore.harshithj.me/api/v1/payment-links`}
                    </pre>
                 </div>
              </div>

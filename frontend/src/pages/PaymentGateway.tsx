@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { paymentApi } from '../api/paymentApi';
+import { apiFetch } from '../lib/api';
 import { Toast } from '../components/ui/Toast';
 import { CreditCard, Smartphone, Building, Wallet, Percent } from 'lucide-react';
 
@@ -52,7 +53,7 @@ export const PaymentGateway = () => {
   const handleGenerateLink = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8081/api/gateway/generate-link/${transactionId}`, {
+      const response = await apiFetch(`/api/gateway/generate-link/${transactionId}`, {
         method: 'POST',
       });
       const data = await response.json();

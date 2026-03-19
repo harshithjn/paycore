@@ -3,6 +3,7 @@ import { Card } from '../ui/Card';
 import { StatusBadge, type Status } from '../ui/StatusBadge';
 import { Button } from '../ui/Button';
 import { CallbackLogs } from '../callback/CallbackLogs';
+import { apiFetch } from '../../lib/api';
 import { CreditCard, Smartphone, Building, Eye, RefreshCw } from 'lucide-react';
 
 interface Transaction {
@@ -40,7 +41,7 @@ export const EnhancedTransactionList: React.FC<EnhancedTransactionListProps> = (
   const fetchTransactions = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8081/api/payment/merchant/${merchantId}/transactions`);
+      const response = await apiFetch(`/api/payment/merchant/${merchantId}/transactions`);
       if (response.ok) {
         const data = await response.json();
         setTransactions(data);
