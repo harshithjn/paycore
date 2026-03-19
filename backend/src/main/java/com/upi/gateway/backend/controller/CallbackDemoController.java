@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+
 
 /**
  * Controller to demonstrate the Observer Pattern callback system
@@ -92,7 +92,7 @@ public class CallbackDemoController {
             log.info("Starting simulated processing for transaction: {}", transactionId);
             
             // Start async processing
-            CompletableFuture<Transaction> future = transactionService.processTransactionWithNotifications(transactionId);
+            transactionService.processTransactionWithNotifications(transactionId);
             
             Map<String, Object> response = new HashMap<>();
             response.put("transactionId", transactionId.toString());

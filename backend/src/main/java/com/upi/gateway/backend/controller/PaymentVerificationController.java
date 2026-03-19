@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+
 
 /**
  * Controller for payment verification operations
@@ -82,7 +82,7 @@ public class PaymentVerificationController {
             UUID transactionId = UUID.fromString(transactionIdStr);
             log.info("Async verification request received for transaction: {}", transactionId);
             
-            CompletableFuture<Transaction> future = verificationService.verifyPaymentAsync(transactionId);
+            verificationService.verifyPaymentAsync(transactionId);
             
             return ResponseEntity.accepted()
                 .body(Map.of(

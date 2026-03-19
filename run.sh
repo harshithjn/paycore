@@ -1,16 +1,29 @@
 #!/bin/bash
 
-echo "🚀 UPI Payment Gateway Simulator - Payment Initiation Module"
+# ==========================================
+#   _____             ____               
+#  |  __ \           / ___|              
+#  | |__) |_ _ _   _| |     ___  _ __ ___ 
+#  |  ___/ _` | | | | |    / _ \| '__/ _ \
+#  | |  | (_| | |_| | |___| (_) | | |  __/
+#  |_|   \__,_|\__, |\____|\___/|_|  \___|
+#               __/ |                     
+#              |___/                      
+# ==========================================
 
-# Colors for output
+# Console Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-print_status() {
-    echo -e "${GREEN}[INFO]${NC} $1"
+print_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
 }
 
 print_warning() {
@@ -21,125 +34,87 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-print_header() {
-    echo -e "${BLUE}[SETUP]${NC} $1"
-}
-
-# Function to kill background processes on exit
 cleanup() {
-    print_status "Shutting down services..."
+    print_info "Shutting down services..."
     kill $(jobs -p) 2>/dev/null
     exit
 }
 
-# Set up trap to cleanup on script exit
 trap cleanup SIGINT SIGTERM EXIT
 
-# Setup function
-setup() {
-    print_header "Setting up dependencies..."
-    
-    # Check if Node.js is installed
-    if ! command -v node &> /dev/null; then
-        print_error "Node.js is not installed. Please install Node.js first."
+check_dependency() {
+    if ! command -v "$1" &> /dev/null; then
+        print_error "$2 is not installed. Please install it first."
         exit 1
     fi
-
-    # Check if Java is installed
-    if ! command -v java &> /dev/null; then
-        print_error "Java is not installed. Please install Java 17+ first."
-        exit 1
-    fi
-
-    # Check if Maven is installed
-    if ! command -v mvn &> /dev/null; then
-        print_error "Maven is not installed. Please install Maven first."
-        exit 1
-    fi
-
-    print_status "Installing Node.js Payment Service dependencies..."
-    cd payment-service
-    npm install
-    cd ..
-
-    print_status "Installing Frontend dependencies..."
-    cd frontend
-    npm install
-    cd ..
-
-    print_status "Building Spring Boot Backend..."
-    cd backend
-    ./mvnw clean compile
-    cd ..
-
-    print_status "Creating environment file for payment service..."
-    if [ ! -f payment-service/.env ]; then
-        cp payment-service/.env.example payment-service/.env
-        print_warning "Please update payment-service/.env with your Supabase credentials"
-    fi
-
-    print_status "Setup completed successfully!"
 }
 
-# Run function
+setup_service() {
+    local dir=$1
+    local name=$2
+    if [ -d "$dir" ]; then
+        print_info "Installing $name dependencies..."
+        (cd "$dir" && npm install)
+    fi
+}
+
+setup() {
+    print_info "Setting up environment and dependencies..."
+
+    check_dependency "node" "Node.js"
+    check_dependency "java" "Java 17+"
+    check_dependency "mvn" "Maven"
+
+    setup_service "payment-service" "Payment Service"
+    setup_service "frontend" "Frontend UI"
+
+    print_info "Building Spring Boot Backend..."
+    (cd backend && ./mvnw clean compile)
+
+    if [ -d "payment-service" ] && [ ! -f "payment-service/.env" ]; then
+        if [ -f "payment-service/.env.example" ]; then
+            cp "payment-service/.env.example" "payment-service/.env"
+            print_warning "Please update payment-service/.env with your credentials."
+        fi
+    fi
+
+    print_success "Setup completed successfully."
+}
+
 run() {
-    print_header "Starting all services..."
+    print_info "Starting all services..."
 
-    print_status "Starting Spring Boot Backend on port 8081..."
-    cd backend
-    ./mvnw spring-boot:run &
-    BACKEND_PID=$!
-    cd ..
+    print_info "Starting Spring Boot Backend (Port 8081)..."
+    (cd backend && ./mvnw spring-boot:run) &
 
-    print_status "Starting Node.js Payment Service on port 3001..."
-    cd payment-service
-    npm start &
-    PAYMENT_SERVICE_PID=$!
-    cd ..
+    if [ -d "payment-service" ]; then
+        print_info "Starting Node.js Payment Service (Port 3001)..."
+        (cd payment-service && npm start) &
+    fi
 
-    print_status "Starting React Frontend on port 5173..."
-    cd frontend
-    npm run dev:no-check &
-    FRONTEND_PID=$!
-    cd ..
+    print_info "Starting React Frontend (Port 5173)..."
+    (cd frontend && npm run dev) &
 
-    print_status "All services started!"
+    sleep 2
     echo ""
-    echo "📋 Service URLs:"
-    echo "- Frontend: http://localhost:5173"
-    echo "- Payment Initiation: http://localhost:5173/merchant/1/payment-initiation"
-    echo "- Transaction Verification: http://localhost:5173/merchant/1/verification"
-    echo "- Payment Service API: http://localhost:3001"
-    echo "- Spring Boot Backend: http://localhost:8081"
-    echo "- H2 Database Console: http://localhost:8081/h2-console"
+    print_success "Services have been initiated."
     echo ""
-    echo "🔧 API Endpoints:"
-    echo "- POST /api/payment/initiate"
-    echo "- GET  /api/payment/status/:transactionId"
-    echo "- GET  /api/payment/merchant/:merchantId/transactions"
-    echo "- GET  /api/payment/methods"
-    echo "- GET  /api/verification/status?id=txn_id"
-    echo "- POST /api/verification/verify"
-    echo "- GET  /api/verification/merchant/:merchantId/transactions"
+    echo "=============================="
+    echo "       Service URLs           "
+    echo "=============================="
+    echo "Frontend:             http://localhost:5173"
+    echo "Backend API:          http://localhost:8081"
+    echo "H2 Database Console:  http://localhost:8081/h2-console"
+    if [ -d "payment-service" ]; then
+        echo "Payment Service API:  http://localhost:3001"
+    fi
+    echo "=============================="
     echo ""
-    echo "🏗️  Architecture Features:"
-    echo "- ✅ Strategy Pattern implementation (UPI, Card, NetBanking processors)"
-    echo "- ✅ Open-Closed Principle compliance"
-    echo "- ✅ Factory Pattern for processor selection"
-    echo "- ✅ State-driven transaction lifecycle management"
-    echo "- ✅ Verification strategies with extensible architecture"
-    echo "- ✅ Real-time transaction status updates"
-    echo "- ✅ Professional fintech UI with status badges"
-    echo "- ✅ Transaction timeline visualization"
-    echo "- ✅ Callback logging and audit trail"
-    echo ""
-    print_warning "Press Ctrl+C to stop all services"
+    print_warning "Press Ctrl+C to terminate all processes."
 
-    # Wait for all background processes
     wait
 }
 
-# Main script logic
 case "${1:-run}" in
     "setup")
         setup
@@ -149,7 +124,7 @@ case "${1:-run}" in
         ;;
     *)
         echo "Usage: $0 [setup|run]"
-        echo "  setup - Install dependencies and setup environment"
+        echo "  setup - Install dependencies and compile project"
         echo "  run   - Start all services (default)"
         exit 1
         ;;

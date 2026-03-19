@@ -25,8 +25,20 @@ public class Merchant {
     @Column(nullable = false)
     private String name;
     
+    @Column(name = "business_name")
+    private String businessName;
+    
+    @Column(name = "logo_url")
+    private String logoUrl;
+    
+    @Column(name = "phone")
+    private String phone;
+    
     @Column(unique = true, nullable = false)
     private String email;
+    
+    @Column(nullable = false)
+    private String password;
     
     @Column(name = "api_key", unique = true)
     private String apiKey;

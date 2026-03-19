@@ -1,6 +1,6 @@
 package com.upi.gateway.backend.manager;
 
-import com.upi.gateway.backend.model.Refund;
+
 import com.upi.gateway.backend.model.Transaction;
 import com.upi.gateway.backend.repository.RefundRepository;
 import jakarta.annotation.PostConstruct;
@@ -25,7 +25,6 @@ public class RefundManager {
     
     // Configuration constants
     private static final BigDecimal MIN_REFUND_AMOUNT = new BigDecimal("1.00");
-    private static final BigDecimal MAX_REFUND_PERCENTAGE = new BigDecimal("1.0"); // 100%
     
     @PostConstruct
     public void init() {

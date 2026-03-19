@@ -7,7 +7,7 @@ import com.upi.gateway.backend.service.TransactionStatusService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -28,7 +26,7 @@ class TransactionStatusControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private TransactionStatusService transactionStatusService;
 
     @Autowired
@@ -56,11 +54,11 @@ class TransactionStatusControllerTest {
         // Act & Assert
         mockMvc.perform(get("/api/transaction/{id}", transactionId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.transaction.id").value(transactionId.toString()))
-                .andExpect(jsonPath("$.currentState").value("CREATED"))
-                .andExpect(jsonPath("$.description").value("Transaction created"))
-                .andExpect(jsonPath("$.isTerminal").value(false))
-                .andExpect(jsonPath("$.validNextStates[0]").value("INITIATED"));
+                .andExpect(jsonPath("₹.transaction.id").value(transactionId.toString()))
+                .andExpect(jsonPath("₹.currentState").value("CREATED"))
+                .andExpect(jsonPath("₹.description").value("Transaction created"))
+                .andExpect(jsonPath("₹.isTerminal").value(false))
+                .andExpect(jsonPath("₹.validNextStates[0]").value("INITIATED"));
     }
 
     @Test
@@ -104,8 +102,8 @@ class TransactionStatusControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.transaction.status").value("INITIATED"))
-                .andExpect(jsonPath("$.currentState").value("INITIATED"));
+                .andExpect(jsonPath("₹.transaction.status").value("INITIATED"))
+                .andExpect(jsonPath("₹.currentState").value("INITIATED"));
     }
 
     @Test
@@ -122,7 +120,7 @@ class TransactionStatusControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Invalid state transition to PROCESSING"));
+                .andExpect(jsonPath("₹.error").value("Invalid state transition to PROCESSING"));
     }
 
     @Test
@@ -136,8 +134,8 @@ class TransactionStatusControllerTest {
         // Act & Assert
         mockMvc.perform(get("/api/transaction/{id}/next-states", transactionId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0]").value("PROCESSING"))
-                .andExpect(jsonPath("$[1]").value("FAILED"));
+                .andExpect(jsonPath("₹[0]").value("PROCESSING"))
+                .andExpect(jsonPath("₹[1]").value("FAILED"));
     }
 
     private Transaction createTestTransaction(UUID id) {

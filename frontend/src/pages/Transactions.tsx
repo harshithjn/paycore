@@ -1,284 +1,233 @@
-import React, { useState } from 'react';
-import { Card } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { transactionApi } from '../api/transactionApi';
+import type { Transaction, TransactionStatusData } from '../types';
+import { LoadingSkeleton } from '../components/ui/LoadingSkeleton';
+import { ErrorState } from '../components/ui/ErrorState';
+import { EmptyState } from '../components/ui/EmptyState';
 import { StatusBadge } from '../components/ui/StatusBadge';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../components/ui/Table';
-import { Modal } from '../components/ui/Modal';
-import { mockTransactions } from '../data/mockData';
-import type { Transaction } from '../types';
-import { Download, Search, Calendar, Eye } from 'lucide-react';
+import { X } from 'lucide-react';
 
-export const Transactions: React.FC = () => {
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+export const Transactions = () => {
+  const { merchantId } = useParams();
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedTxn, setSelectedTxn] = useState<TransactionStatusData | null>(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
 
-  const formatCurrency = (amount: number) => 
-    new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
-
-  const formatDate = (dateString: string) => 
-    new Date(dateString).toLocaleDateString('en-IN', { 
-      day: '2-digit', 
-      month: 'short', 
-      year: 'numeric',
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
-
-  // Filter transactions
-  const filteredTransactions = mockTransactions.filter(transaction => {
-    const matchesStatus = statusFilter === 'all' || transaction.status === statusFilter;
-    const matchesSearch = transaction.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         transaction.merchantTransactionId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (transaction.customerEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
-    return matchesStatus && matchesSearch;
-  });
-
-  // Pagination
-  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedTransactions = filteredTransactions.slice(startIndex, startIndex + itemsPerPage);
-
-  const handleViewDetails = (transaction: Transaction) => {
-    setSelectedTransaction(transaction);
+  const fetchTransactions = async () => {
+    if (!merchantId) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const data = await transactionApi.getAll(Number(merchantId));
+      setTransactions(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load transactions');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Transactions</h1>
-          <p className="text-gray-600 dark:text-gray-400">Manage and track all payment transactions</p>
-        </div>
-        <div className="flex space-x-3">
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
+  const fetchTransactionDetails = async (txnId: string) => {
+    setDetailsLoading(true);
+    try {
+      const details = await transactionApi.getStatusWithDetails(txnId);
+      setSelectedTxn(details);
+    } catch (err) {
+      console.error('Failed to load transaction details:', err);
+    } finally {
+      setDetailsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [merchantId]);
+
+  if (loading) {
+    return (
+      <div>
+        <h1 className="text-2xl font-medium text-[#111] dark:text-[#EAEAEA] mb-6">Transactions</h1>
+        <div className="card p-6">
+          <LoadingSkeleton rows={8} />
         </div>
       </div>
+    );
+  }
 
-      {/* Filters */}
-      <Card className="p-6">
-        <div className="flex flex-col sm:flex-row gap-4">
-          {/* Search */}
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search by transaction ID, merchant ID, or email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 pl-10 pr-4 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-              />
+  if (error) {
+    return (
+      <div>
+        <h1 className="text-2xl font-medium text-[#111] dark:text-[#EAEAEA] mb-6">Transactions</h1>
+        <div className="card p-6">
+          <ErrorState message={error} onRetry={fetchTransactions} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-medium text-[#111] dark:text-[#EAEAEA]">Transactions</h1>
+        <button onClick={fetchTransactions} className="btn-secondary text-sm">
+          Refresh
+        </button>
+      </div>
+
+      <div className="card">
+        {transactions.length === 0 ? (
+          <div className="p-6">
+            <EmptyState 
+              title="No transactions yet" 
+              description="Transactions will appear here once payments are initiated"
+            />
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-[#E5E7EB] dark:border-[#2A2A2A]">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-[#6B7280]">Transaction ID</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-[#6B7280]">Amount</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-[#6B7280]">Method</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-[#6B7280]">Status</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-[#6B7280]">Customer</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-[#6B7280]">Date</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-[#6B7280]">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.map((txn) => (
+                  <tr key={txn.id} className="table-row">
+                    <td className="py-3 px-4 text-sm text-[#111] dark:text-[#EAEAEA] font-mono">
+                      {txn.id.substring(0, 8)}...
+                    </td>
+                    <td className="py-3 px-4 text-sm font-medium text-[#111] dark:text-[#EAEAEA]">
+                      ₹{txn.amount.toFixed(2)}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-[#6B7280]">
+                      {txn.payment_method}
+                    </td>
+                    <td className="py-3 px-4">
+                      <StatusBadge status={txn.status} />
+                    </td>
+                    <td className="py-3 px-4 text-sm text-[#6B7280]">
+                      {txn.customer_email || txn.customer_phone || '-'}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-[#6B7280]">
+                      {txn.created_at ? new Date(txn.created_at).toLocaleDateString() : 'N/A'}
+                    </td>
+                    <td className="py-3 px-4">
+                      <button
+                        onClick={() => fetchTransactionDetails(txn.id)}
+                        className="text-sm text-[#4F46E5] hover:text-[#4338CA] transition-colors duration-150"
+                      >
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Transaction Details Drawer */}
+      {selectedTxn && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 z-50 flex items-center justify-end">
+          <div 
+            className="w-full max-w-2xl h-full bg-white dark:bg-[#111] shadow-2xl overflow-y-auto animate-slide-in"
+            style={{ animation: 'slideIn 200ms ease-out' }}
+          >
+            <div className="sticky top-0 bg-white dark:bg-[#111] border-b border-[#E5E7EB] dark:border-[#2A2A2A] p-6 flex items-center justify-between">
+              <h2 className="text-xl font-medium text-[#111] dark:text-[#EAEAEA]">Transaction Details</h2>
+              <button onClick={() => setSelectedTxn(null)} className="p-2 hover:bg-[#F9FAFB] dark:hover:bg-[#1A1A1A] rounded-lg transition-colors">
+                <X size={20} />
+              </button>
             </div>
-          </div>
 
-          {/* Status Filter */}
-          <div className="sm:w-48">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-            >
-              <option value="all">All Status</option>
-              <option value="success">Success</option>
-              <option value="failed">Failed</option>
-              <option value="pending">Pending</option>
-              <option value="processing">Processing</option>
-            </select>
-          </div>
-
-          {/* Date Range */}
-          <div className="sm:w-48">
-            <Button variant="outline" size="sm" className="w-full justify-start">
-              <Calendar className="h-4 w-4 mr-2" />
-              Date Range
-            </Button>
-          </div>
-        </div>
-      </Card>
-
-      {/* Transactions Table */}
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            All Transactions ({filteredTransactions.length})
-          </h3>
-        </div>
-        
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Transaction ID</TableHead>
-              <TableHead>Merchant ID</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Payment Method</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedTransactions.map((transaction) => (
-              <TableRow key={transaction.id}>
-                <TableCell className="font-mono text-sm">
-                  {transaction.id}
-                </TableCell>
-                <TableCell className="font-mono text-sm">
-                  {transaction.merchantTransactionId}
-                </TableCell>
-                <TableCell className="font-semibold">
-                  {formatCurrency(transaction.amount)}
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={transaction.status} />
-                </TableCell>
-                <TableCell>{transaction.paymentMethod}</TableCell>
-                <TableCell>
-                  <div className="text-sm">
-                    <div>{transaction.customerEmail}</div>
-                    <div className="text-gray-500">{transaction.customerPhone}</div>
+            <div className="p-6 space-y-6">
+              {detailsLoading ? (
+                <LoadingSkeleton rows={6} />
+              ) : (
+                <>
+                  {/* Transaction Info */}
+                  <div>
+                    <h3 className="text-sm font-medium text-[#6B7280] mb-3">Transaction Information</h3>
+                    <div className="space-y-2">
+                      <div className="flex justify-between py-2">
+                        <span className="text-sm text-[#6B7280]">ID</span>
+                        <span className="text-sm text-[#111] dark:text-[#EAEAEA] font-mono">{selectedTxn.transaction.id}</span>
+                      </div>
+                      <div className="flex justify-between py-2">
+                        <span className="text-sm text-[#6B7280]">Amount</span>
+                        <span className="text-sm font-medium text-[#111] dark:text-[#EAEAEA]">₹{selectedTxn.transaction.amount.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between py-2">
+                        <span className="text-sm text-[#6B7280]">Status</span>
+                        <StatusBadge status={selectedTxn.transaction.status} />
+                      </div>
+                      <div className="flex justify-between py-2">
+                        <span className="text-sm text-[#6B7280]">Payment Method</span>
+                        <span className="text-sm text-[#111] dark:text-[#EAEAEA]">{selectedTxn.transaction.payment_method}</span>
+                      </div>
+                    </div>
                   </div>
-                </TableCell>
-                <TableCell>{formatDate(transaction.createdAt)}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleViewDetails(transaction)}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-gray-700 dark:text-gray-300">
-              Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredTransactions.length)} of {filteredTransactions.length} results
-            </div>
-            <div className="flex space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </Button>
+                  {/* State Transitions */}
+                  {selectedTxn.stateTransitions.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-medium text-[#6B7280] mb-3">Timeline</h3>
+                      <div className="space-y-3">
+                        {selectedTxn.stateTransitions.map((st) => (
+                          <div key={st.id} className="flex items-start gap-3">
+                            <div className="w-2 h-2 rounded-full bg-[#4F46E5] mt-1.5" />
+                            <div className="flex-1">
+                              <div className="text-sm text-[#111] dark:text-[#EAEAEA]">
+                                {st.from_status && `${st.from_status} → `}{st.to_status}
+                              </div>
+                              <div className="text-xs text-[#6B7280] mt-1">
+                                {st.transitioned_at ? new Date(st.transitioned_at).toLocaleString() : 'N/A'}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Callback Logs */}
+                  {selectedTxn.callbackLogs.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-medium text-[#6B7280] mb-3">Callback Status</h3>
+                      <div className="text-sm text-[#111] dark:text-[#EAEAEA]">
+                        {selectedTxn.transaction.callback_sent ? 'Callback sent successfully' : 'Pending'}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
-        )}
-      </Card>
+        </div>
+      )}
 
-      {/* Transaction Details Modal */}
-      <Modal
-        isOpen={!!selectedTransaction}
-        onClose={() => setSelectedTransaction(null)}
-        title="Transaction Details"
-        size="lg"
-      >
-        {selectedTransaction && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Transaction ID
-                </label>
-                <p className="font-mono text-sm bg-gray-100 dark:bg-gray-800 p-2 rounded">
-                  {selectedTransaction.id}
-                </p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Status
-                </label>
-                <StatusBadge status={selectedTransaction.status} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Amount
-                </label>
-                <p className="text-lg font-semibold">{formatCurrency(selectedTransaction.amount)}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Payment Method
-                </label>
-                <p>{selectedTransaction.paymentMethod}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Customer Email
-                </label>
-                <p>{selectedTransaction.customerEmail}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Customer Phone
-                </label>
-                <p>{selectedTransaction.customerPhone}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Created At
-                </label>
-                <p>{formatDate(selectedTransaction.createdAt)}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Callback Status
-                </label>
-                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                  selectedTransaction.callbackSent 
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                    : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
-                }`}>
-                  {selectedTransaction.callbackSent ? 'Sent' : 'Pending'}
-                </span>
-              </div>
-            </div>
-            
-            {selectedTransaction.upiTransactionId && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  UPI Transaction ID
-                </label>
-                <p className="font-mono text-sm bg-gray-100 dark:bg-gray-800 p-2 rounded">
-                  {selectedTransaction.upiTransactionId}
-                </p>
-              </div>
-            )}
-            
-            {selectedTransaction.failureReason && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Failure Reason
-                </label>
-                <p className="text-red-600 dark:text-red-400">{selectedTransaction.failureReason}</p>
-              </div>
-            )}
-          </div>
-        )}
-      </Modal>
+      <style>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(100%);
+          }
+          to {
+            transform: translateX(0);
+          }
+        }
+      `}</style>
     </div>
   );
 };

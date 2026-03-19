@@ -1,114 +1,50 @@
-import React, { useEffect, useState } from 'react';
-import { X, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-export interface ToastProps {
-  id: string;
+interface ToastProps {
+  message: string;
   type: 'success' | 'error' | 'info';
-  title: string;
-  message?: string;
   duration?: number;
-  onClose: (id: string) => void;
+  onClose: () => void;
 }
 
-export const Toast: React.FC<ToastProps> = ({
-  id,
-  type,
-  title,
-  message,
-  duration = 5000,
-  onClose
-}) => {
+export const Toast = ({ message, type, duration = 3000, onClose }: ToastProps) => {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(false);
-      setTimeout(() => onClose(id), 300);
+      setTimeout(onClose, 200);
     }, duration);
 
     return () => clearTimeout(timer);
-  }, [id, duration, onClose]);
+  }, [duration, onClose]);
 
-  const getIcon = () => {
-    switch (type) {
-      case 'success':
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
-      case 'error':
-        return <AlertCircle className="w-5 h-5 text-red-500" />;
-      case 'info':
-        return <Info className="w-5 h-5 text-blue-500" />;
-    }
-  };
+  const bgColor = type === 'success' 
+    ? 'bg-[#ECFDF5] dark:bg-[#064E3B] border-[#059669]' 
+    : type === 'error'
+    ? 'bg-[#FEF2F2] dark:bg-[#7F1D1D] border-[#DC2626]'
+    : 'bg-white dark:bg-[#1A1A1A] border-[#E5E7EB] dark:border-[#2A2A2A]';
 
-  const getBgColor = () => {
-    switch (type) {
-      case 'success':
-        return 'bg-green-50 border-green-200';
-      case 'error':
-        return 'bg-red-50 border-red-200';
-      case 'info':
-        return 'bg-blue-50 border-blue-200';
-    }
-  };
+  const textColor = type === 'success'
+    ? 'text-[#059669] dark:text-[#34D399]'
+    : type === 'error'
+    ? 'text-[#DC2626] dark:text-[#F87171]'
+    : 'text-[#111] dark:text-[#EAEAEA]';
 
   return (
     <div
-      className={`
-        fixed top-4 right-4 z-50 max-w-sm w-full
-        transform transition-all duration-300 ease-in-out
-        ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}
-      `}
+      className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg border ${bgColor} ${textColor} shadow-lg transition-all duration-200 ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
+      }`}
     >
-      <div className={`rounded-lg border p-4 shadow-lg ${getBgColor()}`}>
-        <div className="flex items-start">
-          <div className="flex-shrink-0">
-            {getIcon()}
-          </div>
-          <div className="ml-3 flex-1">
-            <p className="text-sm font-medium text-gray-900">{title}</p>
-            {message && (
-              <p className="mt-1 text-sm text-gray-600">{message}</p>
-            )}
-          </div>
-          <div className="ml-4 flex-shrink-0">
-            <button
-              onClick={() => {
-                setIsVisible(false);
-                setTimeout(() => onClose(id), 300);
-              }}
-              className="inline-flex text-gray-400 hover:text-gray-600 focus:outline-none"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+      <div className="flex items-center gap-2">
+        <span className="text-sm">{message}</span>
+        <button onClick={() => { setIsVisible(false); setTimeout(onClose, 200); }} className="ml-2 hover:opacity-70">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
     </div>
   );
-};
-
-export const useToast = () => {
-  const [toasts, setToasts] = useState<ToastProps[]>([]);
-
-  const addToast = (toast: Omit<ToastProps, 'id' | 'onClose'>) => {
-    const id = Math.random().toString(36).substr(2, 9);
-    setToasts(prev => [...prev, { ...toast, id, onClose: removeToast }]);
-  };
-
-  const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
-  };
-
-  const ToastContainer = () => (
-    <>
-      {toasts.map(toast => (
-        <Toast key={toast.id} {...toast} />
-      ))}
-    </>
-  );
-
-  return {
-    addToast,
-    ToastContainer
-  };
 };

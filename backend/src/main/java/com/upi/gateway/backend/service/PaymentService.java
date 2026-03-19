@@ -90,33 +90,10 @@ public class PaymentService implements TransactionSubject {
         
         // Notify observers about INITIATED status
         notifyObservers(transaction);
-        
-        // Process payment asynchronously
-        PaymentProcessor processor = processorOpt.get();
-        processPaymentAsync(transaction, processor);
-        
         return PaymentInitiateResponse.from(transaction, "Payment initiated successfully");
     }
     
-    private void processPaymentAsync(Transaction transaction, PaymentProcessor processor) {
-        // Update status to PROCESSING
-        transaction.setStatus(Transaction.TransactionStatus.PROCESSING);
-        final Transaction savedTransaction = transactionRepository.save(transaction);
-        
-        // Notify observers about PROCESSING status
-        notifyObservers(savedTransaction);
-        
-        // Process payment
-        final UUID transactionId = savedTransaction.getId();
-        processor.process(savedTransaction)
-                .thenAccept(result -> updateTransactionResult(transactionId, result))
-                .exceptionally(throwable -> {
-                    log.error("Payment processing failed for transaction: {}", transactionId, throwable);
-                    PaymentResult failureResult = PaymentResult.failure("Processing error: " + throwable.getMessage());
-                    updateTransactionResult(transactionId, failureResult);
-                    return null;
-                });
-    }
+
     
     @Transactional
     public void updateTransactionResult(UUID transactionId, PaymentResult result) {

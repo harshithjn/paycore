@@ -3,6 +3,8 @@ package com.upi.gateway.backend.service;
 import com.upi.gateway.backend.dto.MerchantLoginRequest;
 import com.upi.gateway.backend.dto.MerchantLoginResponse;
 import com.upi.gateway.backend.dto.MerchantRegisterRequest;
+import com.upi.gateway.backend.dto.MerchantSettingsRequest;
+import com.upi.gateway.backend.dto.MerchantSettingsResponse;
 import com.upi.gateway.backend.model.Merchant;
 import com.upi.gateway.backend.repository.MerchantRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,6 +38,9 @@ public class MerchantService {
         Merchant merchant = Merchant.builder()
                 .name(request.getName())
                 .email(request.getEmail())
+                .password(request.getPassword())
+                .businessName(request.getBusinessName())
+                .phone(request.getPhone())
                 .apiKey(apiKey)
                 .isActive(true)
                 .build();
@@ -46,6 +51,10 @@ public class MerchantService {
     public MerchantLoginResponse login(MerchantLoginRequest request) {
         Merchant merchant = merchantRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+
+        if (!merchant.getPassword().equals(request.getPassword())) {
+            throw new RuntimeException("Invalid credentials");
+        }
 
         if (!merchant.getIsActive()) {
             throw new RuntimeException("Merchant is not active");
@@ -75,4 +84,48 @@ public class MerchantService {
         log.warn("Merchant not found with ID: {}", merchantId);
         return false;
     }
+
+    public MerchantSettingsResponse getSettings(Long merchantId) {
+        Merchant merchant = merchantRepository.findById(merchantId)
+                .orElseThrow(() -> new IllegalArgumentException("Merchant not found"));
+
+        return MerchantSettingsResponse.builder()
+                .id(merchant.getId())
+                .name(merchant.getName())
+                .businessName(merchant.getBusinessName())
+                .email(merchant.getEmail())
+                .phone(merchant.getPhone())
+                .webhookUrl(merchant.getWebhookUrl())
+                .logoUrl(merchant.getLogoUrl())
+                .apiKey(merchant.getApiKey())
+                .isActive(merchant.getIsActive())
+                .build();
+    }
+
+    @Transactional
+    public MerchantSettingsResponse updateSettings(Long merchantId, MerchantSettingsRequest request) {
+        Merchant merchant = merchantRepository.findById(merchantId)
+                .orElseThrow(() -> new IllegalArgumentException("Merchant not found"));
+
+        if (request.getBusinessName() != null) {
+            merchant.setBusinessName(request.getBusinessName());
+        }
+        if (request.getEmail() != null) {
+            merchant.setEmail(request.getEmail());
+        }
+        if (request.getPhone() != null) {
+            merchant.setPhone(request.getPhone());
+        }
+        if (request.getWebhookUrl() != null) {
+            merchant.setWebhookUrl(request.getWebhookUrl());
+        }
+        if (request.getLogoUrl() != null) {
+            merchant.setLogoUrl(request.getLogoUrl());
+        }
+
+        merchantRepository.save(merchant);
+
+        return getSettings(merchantId);
+    }
+
 }

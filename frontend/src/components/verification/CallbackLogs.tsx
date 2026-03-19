@@ -25,14 +25,14 @@ export const CallbackLogs: React.FC<CallbackLogsProps> = ({ callbackLogs }) => {
   };
 
   const formatTimestamp = (timestamp: string) => {
-    return new Date(timestamp).toLocaleString('en-IN', {
+    return timestamp ? new Date(timestamp).toLocaleString('en-IN', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit'
-    });
+    }) : 'N/A';
   };
 
   const formatResponseBody = (responseBody?: string) => {

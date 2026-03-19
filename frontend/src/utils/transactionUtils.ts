@@ -40,7 +40,7 @@ export function fromLegacyTransaction(legacyTransaction: LegacyTransaction): Tra
     id: legacyTransaction.id,
     merchant_id: 1, // Default merchant ID
     amount: legacyTransaction.amount,
-    status: legacyTransaction.status.toUpperCase() as any,
+    status: legacyTransaction.status?.toUpperCase() as any,
     payment_method: legacyTransaction.paymentMethod,
     merchant_transaction_id: legacyTransaction.merchantTransactionId,
     customer_email: legacyTransaction.customerEmail,

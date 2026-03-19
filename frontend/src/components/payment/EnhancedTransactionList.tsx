@@ -53,7 +53,7 @@ export const EnhancedTransactionList: React.FC<EnhancedTransactionListProps> = (
   };
 
   const getPaymentMethodIcon = (method: string) => {
-    switch (method.toUpperCase()) {
+    switch (method?.toUpperCase()) {
       case 'UPI':
         return <Smartphone className="w-4 h-4" />;
       case 'CARD':

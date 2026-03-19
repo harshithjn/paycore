@@ -15,6 +15,7 @@ export interface Transaction {
   callback_sent?: boolean;
   verification_attempts?: number;
   last_verified_at?: string;
+  total_refunded?: number;
 }
 
 export interface CallbackLog {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { verificationApi } from '../api/verificationApi';
 import { TransactionDetailDrawer } from '../components/verification/TransactionDetailDrawer';
@@ -6,7 +6,7 @@ import { StatusBadge } from '../components/ui/StatusBadge';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { useToast } from '../components/ui/Toast';
+import { Toast } from '../components/ui/Toast';
 import type { Transaction } from '../types';
 import { 
   RefreshCw, 
@@ -20,9 +20,9 @@ import {
   Clock
 } from 'lucide-react';
 
-export const TransactionVerification: React.FC = () => {
+export const TransactionVerification = () => {
   const { merchantId } = useParams<{ merchantId: string }>();
-  const { addToast, ToastContainer } = useToast();
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
@@ -44,12 +44,12 @@ export const TransactionVerification: React.FC = () => {
   }, [transactions, searchTerm, statusFilter, paymentMethodFilter]);
 
   useEffect(() => {
-    let interval: number | null = null;
+    let interval: ReturnType<typeof setInterval> | null = null;
     
     if (autoRefresh) {
-      interval = window.setInterval(() => {
+      interval = setInterval(() => {
         loadTransactions();
-      }, 10000); // Refresh every 10 seconds
+      }, 10000);
     }
 
     return () => {
@@ -62,18 +62,10 @@ export const TransactionVerification: React.FC = () => {
   const loadTransactions = async () => {
     setIsLoading(true);
     try {
-      const filters: any = {};
-      if (statusFilter) filters.status = statusFilter;
-      if (paymentMethodFilter) filters.payment_method = paymentMethodFilter;
-
-      const data = await verificationApi.getMerchantTransactions(merchantIdNum, filters);
+      const data = await verificationApi.getMerchantTransactions(merchantIdNum);
       setTransactions(data);
     } catch (error: any) {
-      addToast({
-        type: 'error',
-        title: 'Error',
-        message: 'Failed to load transactions'
-      });
+      setToast({ message: 'Failed to load transactions', type: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -90,11 +82,19 @@ export const TransactionVerification: React.FC = () => {
       );
     }
 
+    if (statusFilter) {
+      filtered = filtered.filter(t => t.status === statusFilter);
+    }
+
+    if (paymentMethodFilter) {
+      filtered = filtered.filter(t => t.payment_method === paymentMethodFilter);
+    }
+
     setFilteredTransactions(filtered);
   };
 
   const getPaymentMethodIcon = (method: string) => {
-    switch (method.toUpperCase()) {
+    switch (method?.toUpperCase()) {
       case 'UPI':
         return <Smartphone className="w-4 h-4" />;
       case 'CARD':
@@ -121,51 +121,48 @@ export const TransactionVerification: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-IN', {
+    return dateString ? new Date(dateString).toLocaleString('en-IN', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    });
+    }) : 'N/A';
   };
 
   const statusOptions = ['', 'CREATED', 'INITIATED', 'PROCESSING', 'SUCCESS', 'FAILED', 'REFUNDED', 'SETTLED'];
   const paymentMethodOptions = ['', 'UPI', 'CARD', 'NETBANKING'];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#0B0B0C] py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Transaction Verification</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-medium text-[#111] dark:text-[#EAEAEA]">Transaction Verification</h1>
+          <p className="mt-2 text-[#6B7280]">
             Merchant ID: {merchantIdNum} | Monitor and verify transaction status
           </p>
         </div>
 
-        {/* Filters */}
         <Card className="p-6 mb-6">
           <div className="flex flex-wrap items-center gap-4">
-            {/* Search */}
             <div className="flex-1 min-w-64">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6B7280] w-4 h-4" />
                 <input
                   type="text"
                   placeholder="Search by ID, merchant ID, or email..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field pl-10"
                 />
               </div>
             </div>
 
-            {/* Status Filter */}
             <div className="min-w-40">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="input-field"
               >
                 <option value="">All Statuses</option>
                 {statusOptions.slice(1).map(status => (
@@ -174,12 +171,11 @@ export const TransactionVerification: React.FC = () => {
               </select>
             </div>
 
-            {/* Payment Method Filter */}
             <div className="min-w-40">
               <select
                 value={paymentMethodFilter}
                 onChange={(e) => setPaymentMethodFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="input-field"
               >
                 <option value="">All Methods</option>
                 {paymentMethodOptions.slice(1).map(method => (
@@ -188,21 +184,19 @@ export const TransactionVerification: React.FC = () => {
               </select>
             </div>
 
-            {/* Auto Refresh Toggle */}
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 id="autoRefresh"
                 checked={autoRefresh}
                 onChange={(e) => setAutoRefresh(e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="rounded border-[#E5E7EB] dark:border-[#2A2A2A]"
               />
-              <label htmlFor="autoRefresh" className="text-sm text-gray-700">
+              <label htmlFor="autoRefresh" className="text-sm text-[#6B7280]">
                 Auto-refresh
               </label>
             </div>
 
-            {/* Refresh Button */}
             <Button
               onClick={loadTransactions}
               disabled={isLoading}
@@ -215,10 +209,9 @@ export const TransactionVerification: React.FC = () => {
           </div>
         </Card>
 
-        {/* Transactions Table */}
         <Card className="overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold">
+          <div className="px-6 py-4 border-b border-[#E5E7EB] dark:border-[#2A2A2A]">
+            <h3 className="text-lg font-medium text-[#111] dark:text-[#EAEAEA]">
               Transactions ({filteredTransactions.length})
             </h3>
           </div>
@@ -226,84 +219,70 @@ export const TransactionVerification: React.FC = () => {
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <LoadingSpinner size="lg" />
-              <span className="ml-3 text-gray-600">Loading transactions...</span>
+              <span className="ml-3 text-[#6B7280]">Loading transactions...</span>
             </div>
           ) : filteredTransactions.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <Shield className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+            <div className="text-center py-12 text-[#6B7280]">
+              <Shield className="w-12 h-12 mx-auto mb-4" />
               <p>No transactions found</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Transaction
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Amount
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Method
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Callback
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Created
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
+              <table className="min-w-full">
+                <thead>
+                  <tr className="border-b border-[#E5E7EB] dark:border-[#2A2A2A]">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#6B7280]">Transaction</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#6B7280]">Amount</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#6B7280]">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#6B7280]">Method</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#6B7280]">Callback</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#6B7280]">Created</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#6B7280]">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody>
                   {filteredTransactions.map((transaction) => (
-                    <tr key={transaction.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                    <tr key={transaction.id} className="table-row">
+                      <td className="px-6 py-4">
                         <div>
-                          <div className="text-sm font-medium text-gray-900 font-mono">
+                          <div className="text-sm font-medium text-[#111] dark:text-[#EAEAEA] font-mono">
                             {transaction.id.substring(0, 8)}...
                           </div>
                           {transaction.merchant_transaction_id && (
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-[#6B7280]">
                               {transaction.merchant_transaction_id}
                             </div>
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-semibold text-gray-900">
+                      <td className="px-6 py-4">
+                        <div className="text-sm font-medium text-[#111] dark:text-[#EAEAEA]">
                           {formatAmount(transaction.amount)}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <StatusBadge status={transaction.status as any} />
+                      <td className="px-6 py-4">
+                        <StatusBadge status={transaction.status} />
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
                           {getPaymentMethodIcon(transaction.payment_method)}
-                          <span className="text-sm text-gray-900">
+                          <span className="text-sm text-[#111] dark:text-[#EAEAEA]">
                             {transaction.payment_method}
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
                           {getCallbackStatusIcon(transaction.callback_sent)}
-                          <span className="text-sm text-gray-600">
+                          <span className="text-sm text-[#6B7280]">
                             {transaction.callback_sent ? 'Sent' : 'Pending'}
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 text-sm text-[#6B7280]">
                         {formatDate(transaction.created_at)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4">
                         <Button
                           onClick={() => setSelectedTransactionId(transaction.id)}
                           variant="outline"
@@ -322,7 +301,6 @@ export const TransactionVerification: React.FC = () => {
         </Card>
       </div>
 
-      {/* Transaction Detail Drawer */}
       {selectedTransactionId && (
         <TransactionDetailDrawer
           transactionId={selectedTransactionId}
@@ -331,7 +309,13 @@ export const TransactionVerification: React.FC = () => {
         />
       )}
 
-      <ToastContainer />
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };

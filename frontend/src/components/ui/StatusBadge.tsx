@@ -1,37 +1,35 @@
-import React from 'react';
-import { cn } from '../../utils/cn';
-
-export type Status = 'success' | 'pending' | 'failed' | 'processing' | 'created' | 'refunded' | 'settled' | 'SUCCESS' | 'FAILED' | 'PROCESSING' | 'CREATED' | 'INITIATED' | 'REFUNDED' | 'SETTLED';
+export type Status = 'SUCCESS' | 'COMPLETED' | 'FAILED' | 'PROCESSING' | 'REFUNDED' | 'SETTLED' | 'PENDING' | 'CREATED' | 'INITIATED';
 
 interface StatusBadgeProps {
-  status: Status;
-  className?: string;
+  status: Status | string;
 }
 
-const statusConfig = {
-  success: { label: 'Success', className: 'status-success' },
-  pending: { label: 'Pending', className: 'status-pending' },
-  failed: { label: 'Failed', className: 'status-failed' },
-  processing: { label: 'Processing', className: 'status-processing' },
-  created: { label: 'Created', className: 'status-pending' },
-  refunded: { label: 'Refunded', className: 'status-success' },
-  settled: { label: 'Settled', className: 'status-success' },
-  // New uppercase statuses
-  SUCCESS: { label: 'Success', className: 'status-success' },
-  FAILED: { label: 'Failed', className: 'status-failed' },
-  PROCESSING: { label: 'Processing', className: 'status-processing' },
-  CREATED: { label: 'Created', className: 'status-pending' },
-  INITIATED: { label: 'Initiated', className: 'status-processing' },
-  REFUNDED: { label: 'Refunded', className: 'status-success' },
-  SETTLED: { label: 'Settled', className: 'status-success' }
-};
+export const StatusBadge = ({ status }: StatusBadgeProps) => {
+  const getStatusClass = (status: string) => {
+    const normalized = status?.toUpperCase() || 'PENDING';
+    switch (normalized) {
+      case 'SUCCESS':
+      case 'COMPLETED':
+        return 'status-success';
+      case 'FAILED':
+        return 'status-failed';
+      case 'PROCESSING':
+        return 'status-processing';
+      case 'REFUNDED':
+        return 'status-refunded';
+      case 'SETTLED':
+        return 'status-settled';
+      case 'PENDING':
+      case 'CREATED':
+      case 'INITIATED':
+      default:
+        return 'status-pending';
+    }
+  };
 
-export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, className }) => {
-  const config = statusConfig[status];
-  
   return (
-    <span className={cn('status-badge', config.className, className)}>
-      {config.label}
+    <span className={`status-badge ${getStatusClass(status)}`}>
+      {status}
     </span>
   );
 };

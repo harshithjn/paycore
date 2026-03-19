@@ -5,7 +5,7 @@ import { TransactionTimeline } from './TransactionTimeline';
 import { CallbackLogs } from './CallbackLogs';
 import { VerificationAttempts } from './VerificationAttempts';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
-import { useToast } from '../ui/Toast';
+import { Toast } from '../ui/Toast';
 import { 
   X, 
   RefreshCw, 
@@ -33,7 +33,7 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
   const [statusData, setStatusData] = useState<TransactionStatusData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
-  const { addToast } = useToast();
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   useEffect(() => {
     if (isOpen && transactionId) {
@@ -47,11 +47,7 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
       const data = await verificationApi.getTransactionStatus(transactionId);
       setStatusData(data);
     } catch (error: any) {
-      addToast({
-        type: 'error',
-        title: 'Error',
-        message: error.response?.data?.error || 'Failed to load transaction details'
-      });
+      setToast({ message: error.response?.data?.error || 'Failed to load transaction details', type: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -64,11 +60,7 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
     try {
       await verificationApi.verifyTransaction(transactionId);
       
-      addToast({
-        type: 'success',
-        title: 'Verification Started',
-        message: 'Transaction verification has been initiated'
-      });
+      setToast({ message: 'Verification started successfully', type: 'success' });
 
       // Reload status after verification
       setTimeout(() => {
@@ -76,10 +68,9 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
       }, 2000);
 
     } catch (error: any) {
-      addToast({
-        type: 'error',
-        title: 'Verification Failed',
-        message: error.response?.data?.error || 'Failed to verify transaction'
+      setToast({ 
+        message: error.response?.data?.error || 'Failed to verify transaction', 
+        type: 'error' 
       });
     } finally {
       setIsVerifying(false);
@@ -87,7 +78,7 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
   };
 
   const getPaymentMethodIcon = (method: string) => {
-    switch (method.toUpperCase()) {
+    switch (method?.toUpperCase()) {
       case 'UPI':
         return <Smartphone className="w-5 h-5" />;
       case 'CARD':
@@ -285,6 +276,14 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
           </div>
         </div>
       </div>
+      
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };

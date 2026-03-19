@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 /**
  * LSP Implementation: Partial Refund Processor
@@ -37,7 +36,6 @@ public class PartialRefundProcessor implements RefundProcessor {
         }
         
         return Refund.builder()
-                .id(UUID.randomUUID())
                 .transactionId(transaction.getId())
                 .amount(amount)
                 .status(Refund.RefundStatus.COMPLETED)

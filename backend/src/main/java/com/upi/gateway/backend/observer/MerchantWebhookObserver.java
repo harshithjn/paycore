@@ -1,6 +1,6 @@
 package com.upi.gateway.backend.observer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.upi.gateway.backend.model.CallbackLog;
 import com.upi.gateway.backend.model.Merchant;
 import com.upi.gateway.backend.model.Transaction;
@@ -34,7 +34,7 @@ public class MerchantWebhookObserver implements TransactionObserver {
     private final CallbackLogRepository callbackLogRepository;
     private final TransactionRepository transactionRepository;
     private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper;
+
     
     private static final int MAX_RETRIES = 3;
     private static final long RETRY_DELAY_MS = 1000;
@@ -93,7 +93,7 @@ public class MerchantWebhookObserver implements TransactionObserver {
                 
                 // Log successful callback
                 logCallback(transaction.getId(), webhookUrl, payload, 
-                          response.getStatusCodeValue(), response.getBody(), retryCount);
+                          response.getStatusCode().value(), response.getBody(), retryCount);
                 
                 // Update transaction callback status
                 updateCallbackStatus(transaction.getId(), true);
@@ -113,7 +113,7 @@ public class MerchantWebhookObserver implements TransactionObserver {
                 if (e instanceof org.springframework.web.client.HttpStatusCodeException) {
                     org.springframework.web.client.HttpStatusCodeException httpEx = 
                         (org.springframework.web.client.HttpStatusCodeException) e;
-                    responseCode = httpEx.getRawStatusCode();
+                    responseCode = httpEx.getStatusCode().value();
                     responseBody = httpEx.getResponseBodyAsString();
                 }
                 

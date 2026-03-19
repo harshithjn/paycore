@@ -11,7 +11,7 @@ export const TransactionTimeline: React.FC<TransactionTimelineProps> = ({
   stateTransitions,
   currentStatus
 }) => {
-  const getStatusIcon = (status: string, isActive: boolean, isFailed: boolean) => {
+  const getStatusIcon = (isActive: boolean, isFailed: boolean) => {
     if (isFailed) {
       return <XCircle className="w-5 h-5 text-red-500" />;
     }
@@ -21,20 +21,20 @@ export const TransactionTimeline: React.FC<TransactionTimelineProps> = ({
     return <CheckCircle className="w-5 h-5 text-green-500" />;
   };
 
-  const getStatusColor = (status: string, isActive: boolean, isFailed: boolean) => {
+  const getStatusColor = (isActive: boolean, isFailed: boolean) => {
     if (isFailed) return 'border-red-500 bg-red-50';
     if (isActive) return 'border-blue-500 bg-blue-50';
     return 'border-green-500 bg-green-50';
   };
 
   const formatTimestamp = (timestamp: string) => {
-    return new Date(timestamp).toLocaleString('en-IN', {
+    return timestamp ? new Date(timestamp).toLocaleString('en-IN', {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit'
-    });
+    }) : 'N/A';
   };
 
   // Create timeline items from state transitions
@@ -47,11 +47,11 @@ export const TransactionTimeline: React.FC<TransactionTimelineProps> = ({
       <div key={transition.id} className="flex items-start space-x-4">
         {/* Timeline dot */}
         <div className="flex flex-col items-center">
-          <div className={`
-            flex items-center justify-center w-10 h-10 rounded-full border-2
-            ${getStatusColor(transition.to_status, isActive, isFailed)}
-          `}>
-            {getStatusIcon(transition.to_status, isActive, isFailed)}
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 
+                  ${getStatusColor(isActive, isFailed)} bg-white z-10 
+                  transition-colors duration-300`}
+                >
+                  {getStatusIcon(isActive, isFailed)}
           </div>
           {!isLast && (
             <div className="w-0.5 h-12 bg-gray-200 mt-2" />

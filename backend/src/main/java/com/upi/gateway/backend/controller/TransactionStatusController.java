@@ -2,7 +2,7 @@ package com.upi.gateway.backend.controller;
 
 import com.upi.gateway.backend.dto.TransactionStatusUpdateRequest;
 import com.upi.gateway.backend.dto.TransactionWithStateResponse;
-import com.upi.gateway.backend.model.Transaction;
+
 import com.upi.gateway.backend.service.TransactionStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -116,11 +116,10 @@ public class TransactionStatusController {
                         .body(Map.of("error", "Invalid state transition to " + request.getStatus()));
             }
             
-            Transaction updated;
             if (request.getFailureReason() != null && !request.getFailureReason().trim().isEmpty()) {
-                updated = transactionStatusService.updateStatus(id, request.getStatus(), request.getFailureReason());
+                transactionStatusService.updateStatus(id, request.getStatus(), request.getFailureReason());
             } else {
-                updated = transactionStatusService.updateStatus(id, request.getStatus());
+                transactionStatusService.updateStatus(id, request.getStatus());
             }
             
             // Return enriched transaction with state info

@@ -10,7 +10,7 @@ interface TransactionStatusProps {
 
 export const TransactionStatus: React.FC<TransactionStatusProps> = ({ transaction }) => {
   const getPaymentMethodIcon = (method: string) => {
-    switch (method.toUpperCase()) {
+    switch (method?.toUpperCase()) {
       case 'UPI':
         return <Smartphone className="w-5 h-5" />;
       case 'CARD':
@@ -43,13 +43,13 @@ export const TransactionStatus: React.FC<TransactionStatusProps> = ({ transactio
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-IN', {
+    return dateString ? new Date(dateString).toLocaleString('en-IN', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    });
+    }) : 'N/A';
   };
 
   return (

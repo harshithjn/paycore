@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
@@ -22,46 +22,12 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
     paymentMethod: 'UPI',
     merchantTransactionId: '',
     customerEmail: '',
-    customerPhone: '',
-    callbackUrl: ''
+    customerPhone: ''
   });
   
-  const [paymentMethods, setPaymentMethods] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingMethods, setIsLoadingMethods] = useState(true);
 
-  useEffect(() => {
-    loadPaymentMethods();
-    loadMerchantWebhookUrl();
-  }, []);
 
-  const loadPaymentMethods = async () => {
-    try {
-      const methods = await paymentApi.getPaymentMethods();
-      setPaymentMethods(methods);
-      if (methods.length > 0) {
-        setFormData(prev => ({ ...prev, paymentMethod: methods[0] }));
-      }
-    } catch (error) {
-      onError('Failed to load payment methods');
-    } finally {
-      setIsLoadingMethods(false);
-    }
-  };
-
-  const loadMerchantWebhookUrl = async () => {
-    try {
-      const response = await fetch(`http://localhost:8081/api/merchant/${merchantId}/webhook`);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.webhookUrl) {
-          setFormData(prev => ({ ...prev, callbackUrl: data.webhookUrl }));
-        }
-      }
-    } catch (error) {
-      console.log('No webhook URL configured for merchant');
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,16 +56,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
     }));
   };
 
-  if (isLoadingMethods) {
-    return (
-      <Card className="p-6">
-        <div className="flex items-center justify-center py-8">
-          <LoadingSpinner size="lg" />
-          <span className="ml-2 text-gray-600">Loading payment methods...</span>
-        </div>
-      </Card>
-    );
-  }
+
 
   return (
     <Card className="p-6">
@@ -122,26 +79,6 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Enter amount"
           />
-        </div>
-
-        <div>
-          <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700 mb-1">
-            Payment Method
-          </label>
-          <select
-            id="paymentMethod"
-            name="paymentMethod"
-            value={formData.paymentMethod}
-            onChange={handleInputChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            {paymentMethods.map(method => (
-              <option key={method} value={method}>
-                {method}
-              </option>
-            ))}
-          </select>
         </div>
 
         <div>
@@ -189,23 +126,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
           />
         </div>
 
-        <div>
-          <label htmlFor="callbackUrl" className="block text-sm font-medium text-gray-700 mb-1">
-            Callback URL (Optional)
-          </label>
-          <input
-            type="url"
-            id="callbackUrl"
-            name="callbackUrl"
-            value={formData.callbackUrl}
-            onChange={handleInputChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="https://your-domain.com/webhook/payment"
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Override merchant webhook URL for this transaction
-          </p>
-        </div>
+
 
         <Button
           type="submit"

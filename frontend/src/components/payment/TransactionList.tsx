@@ -14,7 +14,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   onTransactionClick
 }) => {
   const getPaymentMethodIcon = (method: string) => {
-    switch (method.toUpperCase()) {
+    switch (method?.toUpperCase()) {
       case 'UPI':
         return <Smartphone className="w-4 h-4" />;
       case 'CARD':
@@ -34,12 +34,12 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-IN', {
+    return dateString ? new Date(dateString).toLocaleString('en-IN', {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    });
+    }) : 'N/A';
   };
 
   if (transactions.length === 0) {

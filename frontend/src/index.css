@@ -1,46 +1,113 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@font-face {
+  font-family: "Matter Regular";
+  src: url("https://db.onlinewebfonts.com/t/f56809563b15c7c76669dac9ca9d38ac.woff2") format("woff2");
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans;
+    @apply bg-[#FAFAFA] dark:bg-[#0B0B0C] text-[#111] dark:text-[#EAEAEA];
+    font-family: "Matter Regular", -apple-system, BlinkMacSystemFont, sans-serif;
     margin: 0;
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  * {
+    font-family: "Matter Regular", -apple-system, BlinkMacSystemFont, sans-serif;
   }
 }
 
 @layer components {
   .card {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow-soft border border-gray-200 dark:border-gray-700;
+    @apply bg-white dark:bg-[#1A1A1A] rounded-lg border border-[#E5E7EB] dark:border-[#2A2A2A];
   }
   
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+    @apply bg-[#4F46E5] hover:bg-[#4338CA] text-white px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
   }
   
   .btn-secondary {
-    @apply bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+    @apply border border-[#E5E7EB] dark:border-[#2A2A2A] hover:bg-[#F9FAFB] dark:hover:bg-[#1A1A1A] text-[#111] dark:text-[#EAEAEA] px-4 py-2 rounded-lg transition-all duration-200;
   }
   
   .status-badge {
-    @apply px-2 py-1 rounded-full text-xs font-medium;
+    @apply px-2.5 py-1 rounded-md text-xs font-medium;
   }
   
   .status-success {
-    @apply bg-success-100 text-success-600 dark:bg-success-900 dark:bg-opacity-20 dark:text-success-400;
-  }
-  
-  .status-pending {
-    @apply bg-warning-100 text-warning-600 dark:bg-warning-900 dark:bg-opacity-20 dark:text-warning-400;
+    @apply bg-[#ECFDF5] text-[#059669] dark:bg-[#064E3B] dark:bg-opacity-30 dark:text-[#34D399];
   }
   
   .status-failed {
-    @apply bg-error-100 text-error-600 dark:bg-error-900 dark:bg-opacity-20 dark:text-error-400;
+    @apply bg-[#FEF2F2] text-[#DC2626] dark:bg-[#7F1D1D] dark:bg-opacity-30 dark:text-[#F87171];
   }
   
   .status-processing {
-    @apply bg-primary-100 text-primary-600 dark:bg-primary-900 dark:bg-opacity-20 dark:text-primary-400;
+    @apply bg-[#FEF3C7] text-[#D97706] dark:bg-[#78350F] dark:bg-opacity-30 dark:text-[#FCD34D];
   }
+  
+  .status-pending {
+    @apply bg-[#F3F4F6] text-[#6B7280] dark:bg-[#374151] dark:bg-opacity-30 dark:text-[#9CA3AF];
+  }
+  
+  .status-refunded {
+    @apply bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#5B21B6] dark:bg-opacity-30 dark:text-[#C4B5FD];
+  }
+  
+  .status-settled {
+    @apply bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:bg-opacity-30 dark:text-[#93C5FD];
+  }
+  
+  .input-field {
+    @apply w-full px-3 py-2 border border-[#E5E7EB] dark:border-[#2A2A2A] rounded-lg bg-white dark:bg-[#1A1A1A] text-[#111] dark:text-[#EAEAEA] focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent transition-all duration-200;
+  }
+  
+  .table-row {
+    @apply border-b border-[#E5E7EB] dark:border-[#2A2A2A] hover:bg-[#F9FAFB] dark:hover:bg-[#1A1A1A] transition-colors duration-150;
+  }
+}
+
+/* Smooth transitions */
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 200ms ease-in;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+
+/* Skeleton loader */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(to right, #F3F4F6 4%, #E5E7EB 25%, #F3F4F6 36%);
+  background-size: 1000px 100%;
+}
+
+.dark .skeleton {
+  background: linear-gradient(to right, #1A1A1A 4%, #2A2A2A 25%, #1A1A1A 36%);
+  background-size: 1000px 100%;
 }

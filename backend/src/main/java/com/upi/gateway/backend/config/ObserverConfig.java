@@ -1,18 +1,13 @@
 package com.upi.gateway.backend.config;
 
-import com.upi.gateway.backend.observer.CallbackLogObserver;
-import com.upi.gateway.backend.observer.EnhancedMerchantWebhookObserver;
-import com.upi.gateway.backend.observer.LoggingObserver;
-import com.upi.gateway.backend.observer.MerchantWebhookObserver;
+import com.upi.gateway.backend.observer.TransactionObserver;
 import com.upi.gateway.backend.service.PaymentService;
 import com.upi.gateway.backend.service.PaymentVerificationService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
 
 import jakarta.annotation.PostConstruct;
+import java.util.List;
 
 /**
  * Configuration class for setting up Observer Pattern
@@ -20,20 +15,20 @@ import jakarta.annotation.PostConstruct;
  * Demonstrates both RestTemplate and WebClient based observers
  */
 @Configuration
-@RequiredArgsConstructor
 @Slf4j
 public class ObserverConfig {
     
     private final PaymentService paymentService;
     private final PaymentVerificationService verificationService;
-    private final MerchantWebhookObserver webhookObserver;
-    private final EnhancedMerchantWebhookObserver enhancedWebhookObserver;
-    private final LoggingObserver loggingObserver;
-    private final CallbackLogObserver callbackLogObserver;
+    private final List<TransactionObserver> observers;
     
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+    public ObserverConfig(
+            PaymentService paymentService,
+            PaymentVerificationService verificationService,
+            List<TransactionObserver> observers) {
+        this.paymentService = paymentService;
+        this.verificationService = verificationService;
+        this.observers = observers;
     }
     
     /**
@@ -48,22 +43,15 @@ public class ObserverConfig {
      */
     @PostConstruct
     public void registerObservers() {
-        log.info("Registering observers with PaymentService and PaymentVerificationService...");
+        log.info("Registering {} observers with PaymentService and PaymentVerificationService...", observers.size());
         
-        // Register observers with PaymentService
-        paymentService.registerObserver(webhookObserver);
-        paymentService.registerObserver(enhancedWebhookObserver);
-        paymentService.registerObserver(loggingObserver);
-        paymentService.registerObserver(callbackLogObserver);
+        // Register all observers with both services
+        for (TransactionObserver observer : observers) {
+            paymentService.registerObserver(observer);
+            verificationService.registerObserver(observer);
+            log.info("Registered observer: {}", observer.getType());
+        }
         
-        // Register observers with PaymentVerificationService
-        verificationService.registerObserver(webhookObserver);
-        verificationService.registerObserver(enhancedWebhookObserver);
-        verificationService.registerObserver(loggingObserver);
-        verificationService.registerObserver(callbackLogObserver);
-        
-        log.info("Successfully registered {} observers with both services", 4);
-        log.info("Registered observers: MerchantWebhookObserver (RestTemplate), " +
-                "EnhancedMerchantWebhookObserver (WebClient), LoggingObserver, CallbackLogObserver");
+        log.info("Successfully registered all observers with both services");
     }
 }

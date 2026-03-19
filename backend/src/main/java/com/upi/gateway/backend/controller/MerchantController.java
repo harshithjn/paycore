@@ -4,6 +4,8 @@ import com.upi.gateway.backend.dto.MerchantLoginRequest;
 import com.upi.gateway.backend.dto.MerchantLoginResponse;
 import com.upi.gateway.backend.dto.MerchantRegisterRequest;
 import com.upi.gateway.backend.dto.MerchantRegisterResponse;
+import com.upi.gateway.backend.dto.MerchantSettingsRequest;
+import com.upi.gateway.backend.dto.MerchantSettingsResponse;
 import com.upi.gateway.backend.model.Merchant;
 import com.upi.gateway.backend.service.MerchantService;
 import jakarta.validation.Valid;
@@ -89,4 +91,35 @@ public class MerchantController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    /**
+     * GET /api/merchant/{merchantId}/settings
+     * Get merchant settings
+     */
+    @GetMapping("/{merchantId}/settings")
+    public ResponseEntity<?> getSettings(@PathVariable Long merchantId) {
+        try {
+            MerchantSettingsResponse settings = merchantService.getSettings(merchantId);
+            return ResponseEntity.ok(settings);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * PUT /api/merchant/{merchantId}/settings
+     * Update merchant settings
+     */
+    @PutMapping("/{merchantId}/settings")
+    public ResponseEntity<?> updateSettings(
+            @PathVariable Long merchantId,
+            @Valid @RequestBody MerchantSettingsRequest request) {
+        try {
+            MerchantSettingsResponse settings = merchantService.updateSettings(merchantId, request);
+            return ResponseEntity.ok(settings);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

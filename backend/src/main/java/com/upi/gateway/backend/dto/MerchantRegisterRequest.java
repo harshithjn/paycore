@@ -20,4 +20,6 @@ public class MerchantRegisterRequest {
 
     @NotBlank
     private String businessName;
+
+    private String phone;
 }

@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
+
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
@@ -112,7 +112,7 @@ public class EnhancedMerchantWebhookObserver implements CallbackObserver, Transa
                     
                     if (error instanceof WebClientResponseException) {
                         WebClientResponseException webEx = (WebClientResponseException) error;
-                        responseCode = webEx.getRawStatusCode();
+                        responseCode = webEx.getStatusCode().value();
                         responseBody = webEx.getResponseBodyAsString();
                     }
                     

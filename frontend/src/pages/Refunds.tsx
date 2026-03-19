@@ -1,323 +1,283 @@
-import React, { useState } from 'react';
-import { Card } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { transactionApi } from '../api/transactionApi';
+import { refundApi, type RefundRequest, type RefundResponse } from '../api/refundApi';
+import type { Transaction } from '../types';
+import { LoadingSkeleton } from '../components/ui/LoadingSkeleton';
+import { ErrorState } from '../components/ui/ErrorState';
+import { EmptyState } from '../components/ui/EmptyState';
 import { StatusBadge } from '../components/ui/StatusBadge';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../components/ui/Table';
-import { Modal } from '../components/ui/Modal';
-import { mockRefunds, mockTransactions } from '../data/mockData';
-import type { Refund } from '../types';
-import { Plus, Search, Calendar, Eye } from 'lucide-react';
+import { Toast } from '../components/ui/Toast';
+import { X } from 'lucide-react';
 
-export const Refunds: React.FC = () => {
-  const [selectedRefund, setSelectedRefund] = useState<Refund | null>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const formatCurrency = (amount: number) => 
-    new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
-
-  const formatDate = (dateString: string) => 
-    new Date(dateString).toLocaleDateString('en-IN', { 
-      day: '2-digit', 
-      month: 'short', 
-      year: 'numeric',
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
-
-  const filteredRefunds = mockRefunds.filter(refund => {
-    const matchesStatus = statusFilter === 'all' || refund.status === statusFilter;
-    const matchesSearch = refund.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         refund.transactionId.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesStatus && matchesSearch;
+export const Refunds = () => {
+  const { merchantId } = useParams();
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedTxn, setSelectedTxn] = useState<Transaction | null>(null);
+  const [refunds, setRefunds] = useState<RefundResponse[]>([]);
+  const [remainingAmount, setRemainingAmount] = useState<number>(0);
+  const [refundLoading, setRefundLoading] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  
+  const [refundForm, setRefundForm] = useState({
+    amount: '',
+    type: 'PARTIAL' as 'FULL' | 'PARTIAL',
+    reason: '',
   });
 
+  const fetchTransactions = async () => {
+    if (!merchantId) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const data = await transactionApi.getAll(Number(merchantId));
+      const refundable = data.filter(t => t.status === 'SUCCESS' || t.status === 'SETTLED');
+      setTransactions(refundable);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load transactions');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openRefundModal = async (txn: Transaction) => {
+    setSelectedTxn(txn);
+    setRefundForm({ amount: txn.amount.toString(), type: 'FULL', reason: '' });
+    
+    try {
+      const [refundList, remaining] = await Promise.all([
+        refundApi.getRefundsByTransaction(txn.id),
+        refundApi.getRemainingAmount(txn.id),
+      ]);
+      setRefunds(refundList);
+      setRemainingAmount(remaining.remainingAmount);
+    } catch (err) {
+      console.error('Failed to load refund data:', err);
+    }
+  };
+
+  const handleRefund = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!selectedTxn) return;
+
+    setRefundLoading(true);
+
+    try {
+      const request: RefundRequest = {
+        transactionId: selectedTxn.id,
+        amount: parseFloat(refundForm.amount),
+        type: refundForm.type,
+        reason: refundForm.reason || undefined,
+      };
+
+      const response = await refundApi.processRefund(request);
+      
+      if (response.status === 'COMPLETED') {
+        setToast({ message: 'Refund processed successfully', type: 'success' });
+        setSelectedTxn(null);
+        fetchTransactions();
+      } else {
+        setToast({ message: response.message || 'Refund failed', type: 'error' });
+      }
+    } catch (err) {
+      setToast({ 
+        message: err instanceof Error ? err.message : 'Failed to process refund', 
+        type: 'error' 
+      });
+    } finally {
+      setRefundLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [merchantId]);
+
+  if (loading) {
+    return (
+      <div>
+        <h1 className="text-2xl font-medium text-[#111] dark:text-[#EAEAEA] mb-6">Refunds</h1>
+        <div className="card p-6">
+          <LoadingSkeleton rows={6} />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <h1 className="text-2xl font-medium text-[#111] dark:text-[#EAEAEA] mb-6">Refunds</h1>
+        <div className="card p-6">
+          <ErrorState message={error} onRetry={fetchTransactions} />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Refunds</h1>
-          <p className="text-gray-600 dark:text-gray-400">Process and track payment refunds</p>
-        </div>
-        <Button onClick={() => setShowCreateModal(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Create Refund
-        </Button>
-      </div>
+    <div>
+      <h1 className="text-2xl font-medium text-[#111] dark:text-[#EAEAEA] mb-6">Refunds</h1>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="p-6">
-          <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Refunds</div>
-          <div className="text-2xl font-bold text-gray-900 dark:text-white">₹8,750</div>
-          <div className="text-sm text-green-600">+2.5% from last month</div>
-        </Card>
-        <Card className="p-6">
-          <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Pending</div>
-          <div className="text-2xl font-bold text-gray-900 dark:text-white">2</div>
-          <div className="text-sm text-orange-600">Processing</div>
-        </Card>
-        <Card className="p-6">
-          <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Completed</div>
-          <div className="text-2xl font-bold text-gray-900 dark:text-white">15</div>
-          <div className="text-sm text-green-600">This month</div>
-        </Card>
-        <Card className="p-6">
-          <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Success Rate</div>
-          <div className="text-2xl font-bold text-gray-900 dark:text-white">98.2%</div>
-          <div className="text-sm text-green-600">Excellent</div>
-        </Card>
-      </div>
-
-      {/* Filters */}
-      <Card className="p-6">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search by refund ID or transaction ID..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 pl-10 pr-4 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-              />
-            </div>
-          </div>
-
-          <div className="sm:w-48">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-            >
-              <option value="all">All Status</option>
-              <option value="pending">Pending</option>
-              <option value="processing">Processing</option>
-              <option value="success">Success</option>
-              <option value="failed">Failed</option>
-            </select>
-          </div>
-
-          <div className="sm:w-48">
-            <Button variant="outline" size="sm" className="w-full justify-start">
-              <Calendar className="h-4 w-4 mr-2" />
-              Date Range
-            </Button>
-          </div>
-        </div>
-      </Card>
-
-      {/* Refunds Table */}
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Refund Requests ({filteredRefunds.length})
-          </h3>
-        </div>
-        
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Refund ID</TableHead>
-              <TableHead>Transaction ID</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Reason</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead>Processed</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredRefunds.map((refund) => (
-              <TableRow key={refund.id}>
-                <TableCell className="font-mono text-sm">
-                  {refund.id}
-                </TableCell>
-                <TableCell className="font-mono text-sm">
-                  {refund.transactionId}
-                </TableCell>
-                <TableCell className="font-semibold">
-                  {formatCurrency(refund.amount)}
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={refund.status as any} />
-                </TableCell>
-                <TableCell className="max-w-xs truncate">
-                  {refund.reason}
-                </TableCell>
-                <TableCell>{formatDate(refund.createdAt)}</TableCell>
-                <TableCell>
-                  {refund.processedAt ? (
-                    formatDate(refund.processedAt)
-                  ) : (
-                    <span className="text-gray-500">-</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedRefund(refund)}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Card>
-
-      {/* Create Refund Modal */}
-      <Modal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        title="Create Refund Request"
-        size="lg"
-      >
-        <form className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Transaction ID
-            </label>
-            <select className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
-              <option value="">Select a transaction</option>
-              {mockTransactions
-                .filter(t => t.status === 'success')
-                .map(transaction => (
-                  <option key={transaction.id} value={transaction.id}>
-                    {transaction.id} - {formatCurrency(transaction.amount)}
-                  </option>
-                ))}
-            </select>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Refund Amount (INR)
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-                placeholder="0.00"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Refund Type
-              </label>
-              <select className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
-                <option value="full">Full Refund</option>
-                <option value="partial">Partial Refund</option>
-              </select>
-            </div>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Refund Reason
-            </label>
-            <textarea
-              rows={3}
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-              placeholder="Explain the reason for refund..."
+      <div className="card">
+        {transactions.length === 0 ? (
+          <div className="p-6">
+            <EmptyState 
+              title="No refundable transactions" 
+              description="Only successful transactions can be refunded"
             />
           </div>
-          
-          <div className="flex justify-end space-x-3 pt-4">
-            <Button variant="outline" onClick={() => setShowCreateModal(false)}>
-              Cancel
-            </Button>
-            <Button type="submit">
-              Create Refund
-            </Button>
-          </div>
-        </form>
-      </Modal>
-
-      {/* Refund Details Modal */}
-      <Modal
-        isOpen={!!selectedRefund}
-        onClose={() => setSelectedRefund(null)}
-        title="Refund Details"
-        size="lg"
-      >
-        {selectedRefund && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Refund ID
-                </label>
-                <p className="font-mono text-sm bg-gray-100 dark:bg-gray-800 p-2 rounded">
-                  {selectedRefund.id}
-                </p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Status
-                </label>
-                <StatusBadge status={selectedRefund.status as any} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Transaction ID
-                </label>
-                <p className="font-mono text-sm bg-gray-100 dark:bg-gray-800 p-2 rounded">
-                  {selectedRefund.transactionId}
-                </p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Amount
-                </label>
-                <p className="text-lg font-semibold">{formatCurrency(selectedRefund.amount)}</p>
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Refund Reason
-              </label>
-              <p className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">{selectedRefund.reason}</p>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Created At
-                </label>
-                <p>{formatDate(selectedRefund.createdAt)}</p>
-              </div>
-              {selectedRefund.processedAt && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Processed At
-                  </label>
-                  <p>{formatDate(selectedRefund.processedAt)}</p>
-                </div>
-              )}
-            </div>
-            
-            {selectedRefund.refundTransactionId && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Refund Transaction ID
-                </label>
-                <p className="font-mono text-sm bg-gray-100 dark:bg-gray-800 p-2 rounded">
-                  {selectedRefund.refundTransactionId}
-                </p>
-              </div>
-            )}
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-[#E5E7EB] dark:border-[#2A2A2A]">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-[#6B7280]">Transaction ID</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-[#6B7280]">Amount</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-[#6B7280]">Status</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-[#6B7280]">Date</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-[#6B7280]">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.map((txn) => (
+                  <tr key={txn.id} className="table-row">
+                    <td className="py-3 px-4 text-sm text-[#111] dark:text-[#EAEAEA] font-mono">
+                      {txn.id.substring(0, 8)}...
+                    </td>
+                    <td className="py-3 px-4 text-sm font-medium text-[#111] dark:text-[#EAEAEA]">
+                      ₹{txn.amount.toFixed(2)}
+                    </td>
+                    <td className="py-3 px-4">
+                      <StatusBadge status={txn.status} />
+                    </td>
+                    <td className="py-3 px-4 text-sm text-[#6B7280]">
+                      {txn.created_at ? new Date(txn.created_at).toLocaleDateString() : 'N/A'}
+                    </td>
+                    <td className="py-3 px-4">
+                      <button
+                        onClick={() => openRefundModal(txn)}
+                        className="text-sm text-[#4F46E5] hover:text-[#4338CA] transition-colors duration-150"
+                      >
+                        Refund
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
-      </Modal>
+      </div>
+
+      {/* Refund Modal */}
+      {selectedTxn && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 z-50 flex items-center justify-center p-4">
+          <div className="w-full max-w-lg bg-white dark:bg-[#111] rounded-lg shadow-2xl">
+            <div className="border-b border-[#E5E7EB] dark:border-[#2A2A2A] p-6 flex items-center justify-between">
+              <h2 className="text-xl font-medium text-[#111] dark:text-[#EAEAEA]">Process Refund</h2>
+              <button onClick={() => setSelectedTxn(null)} className="p-2 hover:bg-[#F9FAFB] dark:hover:bg-[#1A1A1A] rounded-lg transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6">
+              <div className="mb-6 p-4 bg-[#F9FAFB] dark:bg-[#1A1A1A] rounded-lg">
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm text-[#6B7280]">Transaction Amount</span>
+                  <span className="text-sm font-medium text-[#111] dark:text-[#EAEAEA]">₹{selectedTxn.amount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-[#6B7280]">Remaining Refundable</span>
+                  <span className="text-sm font-medium text-[#059669]">₹{remainingAmount.toFixed(2)}</span>
+                </div>
+              </div>
+
+              {refunds.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-sm font-medium text-[#6B7280] mb-2">Previous Refunds</h3>
+                  <div className="space-y-2">
+                    {refunds.map((refund) => (
+                      <div key={refund.refundId} className="flex justify-between text-sm">
+                        <span className="text-[#6B7280]">{refund.type}</span>
+                        <span className="text-[#111] dark:text-[#EAEAEA]">₹{refund.amount.toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <form onSubmit={handleRefund} className="space-y-4">
+                <div>
+                  <label className="block text-sm text-[#6B7280] mb-2">Refund Type</label>
+                  <select
+                    value={refundForm.type}
+                    onChange={(e) => setRefundForm({ ...refundForm, type: e.target.value as 'FULL' | 'PARTIAL' })}
+                    className="input-field"
+                  >
+                    <option value="FULL">Full Refund</option>
+                    <option value="PARTIAL">Partial Refund</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm text-[#6B7280] mb-2">Amount</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={refundForm.amount}
+                    onChange={(e) => setRefundForm({ ...refundForm, amount: e.target.value })}
+                    className="input-field"
+                    max={remainingAmount}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm text-[#6B7280] mb-2">Reason</label>
+                  <textarea
+                    value={refundForm.reason}
+                    onChange={(e) => setRefundForm({ ...refundForm, reason: e.target.value })}
+                    className="input-field"
+                    rows={3}
+                    placeholder="Optional reason for refund"
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedTxn(null)}
+                    className="btn-secondary flex-1"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={refundLoading}
+                    className="btn-primary flex-1"
+                  >
+                    {refundLoading ? 'Processing...' : 'Process Refund'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };
