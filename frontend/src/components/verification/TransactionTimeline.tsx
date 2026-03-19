@@ -39,8 +39,8 @@ export const TransactionTimeline: React.FC<TransactionTimelineProps> = ({
 
   // Create timeline items from state transitions
   const timelineItems = stateTransitions.map((transition, index) => {
-    const isActive = transition.to_status === currentStatus;
-    const isFailed = transition.to_status === 'FAILED';
+    const isActive = transition.toStatus === currentStatus;
+    const isFailed = transition.toStatus === 'FAILED';
     const isLast = index === stateTransitions.length - 1;
 
     return (
@@ -62,25 +62,25 @@ export const TransactionTimeline: React.FC<TransactionTimelineProps> = ({
         <div className="flex-1 pb-8">
           <div className="flex items-center space-x-2 mb-1">
             <h4 className="text-sm font-semibold text-gray-900">
-              {transition.to_status}
+              {transition.toStatus}
             </h4>
-            {transition.from_status && (
+            {transition.fromStatus && (
               <>
                 <ArrowRight className="w-3 h-3 text-gray-400" />
                 <span className="text-xs text-gray-500">
-                  from {transition.from_status}
+                  from {transition.fromStatus}
                 </span>
               </>
             )}
           </div>
           
           <p className="text-xs text-gray-600 mb-2">
-            {formatTimestamp(transition.transitioned_at)}
+            {formatTimestamp(transition.transitionedAt)}
           </p>
           
-          {transition.transition_reason && (
+          {transition.transitionReason && (
             <p className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
-              {transition.transition_reason}
+              {transition.transitionReason}
             </p>
           )}
         </div>
