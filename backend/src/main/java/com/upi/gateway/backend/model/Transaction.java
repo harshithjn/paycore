@@ -66,6 +66,10 @@ public class Transaction {
     @Column(name = "last_verified_at")
     private LocalDateTime lastVerifiedAt;
     
+    @Column(name = "total_refunded", precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal totalRefunded = BigDecimal.ZERO;
+    
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
