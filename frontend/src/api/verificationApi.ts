@@ -12,7 +12,7 @@ export const verificationApi = {
   },
 
   getTransactionStatus: async (transactionId: string): Promise<any> => {
-    const response = await apiClient.get(`/api/transaction/status/${transactionId}`);
+    const response = await apiClient.get(`/api/transaction/${transactionId}`);
     return response.data;
   },
 

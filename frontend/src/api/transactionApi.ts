@@ -13,7 +13,7 @@ export const transactionApi = {
   },
 
   getStatusWithDetails: async (transactionId: string): Promise<TransactionStatusData> => {
-    const response = await apiClient.get(`/api/transaction/status/${transactionId}`);
+    const response = await apiClient.get(`/api/transaction/${transactionId}`);
     return response.data;
   },
 };

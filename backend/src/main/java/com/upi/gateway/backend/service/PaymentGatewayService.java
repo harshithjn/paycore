@@ -20,7 +20,8 @@ public class PaymentGatewayService {
     private final TransactionRepository transactionRepository;
     private final PaymentService paymentService;
     
-    private static final String PAYMENT_BASE_URL = "http://localhost:5173/payment";
+    @org.springframework.beans.factory.annotation.Value("${payment.link.base-url:http://localhost:5173/payment}")
+    private String paymentBaseUrl;
     
     /**
      * Generate payment link and QR code for transaction
@@ -33,7 +34,8 @@ public class PaymentGatewayService {
             throw new IllegalStateException("Payment link can only be generated for CREATED transactions");
         }
         
-        String paymentLink = String.format("%s/%s", PAYMENT_BASE_URL, transactionId);
+        String baseUrl = paymentBaseUrl.endsWith("/") ? paymentBaseUrl.substring(0, paymentBaseUrl.length() - 1) : paymentBaseUrl;
+        String paymentLink = String.format("%s/%s", baseUrl, transactionId);
         String qrCodeData = generateUPIQRString(transaction);
         
         log.info("Generated payment link for transaction: {}", transactionId);
