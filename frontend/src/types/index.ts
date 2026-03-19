@@ -1,50 +1,50 @@
 export interface Transaction {
   id: string;
-  merchant_id: number;
+  merchantId: number;
   amount: number;
   status: 'CREATED' | 'INITIATED' | 'PROCESSING' | 'SUCCESS' | 'FAILED' | 'REFUNDED' | 'SETTLED';
-  payment_method: string;
-  merchant_transaction_id?: string;
-  customer_email?: string;
-  customer_phone?: string;
-  created_at: string;
-  updated_at: string;
-  upi_transaction_id?: string;
-  failure_reason?: string;
-  callback_url?: string;
-  callback_sent?: boolean;
-  verification_attempts?: number;
-  last_verified_at?: string;
-  total_refunded?: number;
+  paymentMethod: string;
+  merchantTransactionId?: string;
+  customerEmail?: string;
+  customerPhone?: string;
+  createdAt: string;
+  updatedAt: string;
+  upiTransactionId?: string;
+  failureReason?: string;
+  callbackUrl?: string;
+  callbackSent?: boolean;
+  verificationAttempts?: number;
+  lastVerifiedAt?: string;
+  totalRefunded?: number;
 }
 
 export interface CallbackLog {
   id: string;
-  transaction_id: string;
-  status_sent: string;
-  callback_url?: string;
-  response_code?: number;
-  response_body?: string;
+  transactionId: string;
+  statusSent: string;
+  callbackUrl?: string;
+  responseCode?: number;
+  responseBody?: string;
   timestamp: string;
-  retry_count: number;
+  retryCount: number;
 }
 
 export interface StateTransition {
   id: string;
-  transaction_id: string;
-  from_status?: string;
-  to_status: string;
-  transition_reason?: string;
-  transitioned_at: string;
+  transactionId: string;
+  fromStatus?: string;
+  toStatus: string;
+  transitionReason?: string;
+  transitionedAt: string;
 }
 
 export interface VerificationAttempt {
   id: string;
-  transaction_id: string;
-  verification_type: string;
+  transactionId: string;
+  verificationType: string;
   status: string;
-  verification_data: any;
-  verified_at: string;
+  verificationData: any;
+  verifiedAt: string;
 }
 
 export interface TransactionStatusData {

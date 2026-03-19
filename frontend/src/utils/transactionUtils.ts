@@ -22,15 +22,15 @@ export function toLegacyTransaction(transaction: Transaction): LegacyTransaction
     id: transaction.id,
     amount: transaction.amount,
     status: transaction.status.toLowerCase() as any,
-    paymentMethod: transaction.payment_method,
-    merchantTransactionId: transaction.merchant_transaction_id || '',
-    customerEmail: transaction.customer_email,
-    customerPhone: transaction.customer_phone,
-    createdAt: transaction.created_at,
-    updatedAt: transaction.updated_at,
+    paymentMethod: transaction.paymentMethod,
+    merchantTransactionId: transaction.merchantTransactionId || '',
+    customerEmail: transaction.customerEmail,
+    customerPhone: transaction.customerPhone,
+    createdAt: transaction.createdAt,
+    updatedAt: transaction.updatedAt,
     callbackSent: true, // Default for compatibility
-    upiTransactionId: transaction.upi_transaction_id,
-    failureReason: transaction.failure_reason
+    upiTransactionId: transaction.upiTransactionId,
+    failureReason: transaction.failureReason
   };
 }
 
@@ -38,16 +38,16 @@ export function toLegacyTransaction(transaction: Transaction): LegacyTransaction
 export function fromLegacyTransaction(legacyTransaction: LegacyTransaction): Transaction {
   return {
     id: legacyTransaction.id,
-    merchant_id: 1, // Default merchant ID
+    merchantId: 1, // Default merchant ID
     amount: legacyTransaction.amount,
     status: legacyTransaction.status?.toUpperCase() as any,
-    payment_method: legacyTransaction.paymentMethod,
-    merchant_transaction_id: legacyTransaction.merchantTransactionId,
-    customer_email: legacyTransaction.customerEmail,
-    customer_phone: legacyTransaction.customerPhone,
-    created_at: legacyTransaction.createdAt,
-    updated_at: legacyTransaction.updatedAt,
-    upi_transaction_id: legacyTransaction.upiTransactionId,
-    failure_reason: legacyTransaction.failureReason
+    paymentMethod: legacyTransaction.paymentMethod,
+    merchantTransactionId: legacyTransaction.merchantTransactionId,
+    customerEmail: legacyTransaction.customerEmail,
+    customerPhone: legacyTransaction.customerPhone,
+    createdAt: legacyTransaction.createdAt,
+    updatedAt: legacyTransaction.updatedAt,
+    upiTransactionId: legacyTransaction.upiTransactionId,
+    failureReason: legacyTransaction.failureReason
   };
 }

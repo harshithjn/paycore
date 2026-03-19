@@ -149,7 +149,7 @@ export const Dashboard = () => {
                       ₹{txn.amount.toFixed(2)}
                     </td>
                     <td className="py-3 px-4 text-sm text-[#6B7280]">
-                      {txn.payment_method}
+                      {txn.paymentMethod}
                     </td>
                     <td className="py-3 px-4">
                       <span className={`status-badge status-${txn.status.toLowerCase()}`}>
@@ -157,7 +157,7 @@ export const Dashboard = () => {
                       </span>
                     </td>
                     <td className="py-3 px-4 text-sm text-[#6B7280]">
-                      {txn.created_at ? new Date(txn.created_at).toLocaleDateString() : 'N/A'}
+                      {txn.createdAt ? new Date(txn.createdAt).toLocaleDateString() : 'N/A'}
                     </td>
                   </tr>
                 ))}

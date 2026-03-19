@@ -72,7 +72,7 @@ export const PaymentInitiation = () => {
           setToast({
             message: transaction.status === 'SUCCESS' 
               ? 'Payment completed successfully' 
-              : transaction.failure_reason || 'Payment failed',
+              : transaction.failureReason || 'Payment failed',
             type: transaction.status === 'SUCCESS' ? 'success' : 'error'
           });
         }

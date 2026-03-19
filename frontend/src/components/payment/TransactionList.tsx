@@ -69,13 +69,13 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="flex items-center space-x-2">
-                  {getPaymentMethodIcon(transaction.payment_method)}
+                  {getPaymentMethodIcon(transaction.paymentMethod)}
                   <span className="text-sm font-medium text-gray-900">
-                    {transaction.payment_method}
+                    {transaction.paymentMethod}
                   </span>
                 </div>
                 <div className="text-sm text-gray-500">
-                  {formatDate(transaction.created_at)}
+                  {formatDate(transaction.createdAt)}
                 </div>
               </div>
               
@@ -84,9 +84,9 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                   <div className="text-sm font-semibold text-gray-900">
                     {formatAmount(transaction.amount)}
                   </div>
-                  {transaction.merchant_transaction_id && (
+                  {transaction.merchantTransactionId && (
                     <div className="text-xs text-gray-500 font-mono">
-                      {transaction.merchant_transaction_id}
+                      {transaction.merchantTransactionId}
                     </div>
                   )}
                 </div>
@@ -94,9 +94,9 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               </div>
             </div>
             
-            {transaction.failure_reason && (
+            {transaction.failureReason && (
               <div className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded">
-                {transaction.failure_reason}
+                {transaction.failureReason}
               </div>
             )}
           </div>

@@ -86,8 +86,8 @@ export const TransactionStatus: React.FC<TransactionStatusProps> = ({ transactio
             Payment Method
           </label>
           <div className="flex items-center space-x-2">
-            {getPaymentMethodIcon(transaction.payment_method)}
-            <span className="text-sm font-medium">{transaction.payment_method}</span>
+            {getPaymentMethodIcon(transaction.paymentMethod)}
+            <span className="text-sm font-medium">{transaction.paymentMethod}</span>
           </div>
         </div>
 
@@ -96,57 +96,57 @@ export const TransactionStatus: React.FC<TransactionStatusProps> = ({ transactio
             Created At
           </label>
           <p className="text-sm text-gray-700">
-            {formatDate(transaction.created_at)}
+            {formatDate(transaction.createdAt)}
           </p>
         </div>
 
-        {transaction.merchant_transaction_id && (
+        {transaction.merchantTransactionId && (
           <div>
             <label className="block text-sm font-medium text-gray-500 mb-1">
               Merchant Transaction ID
             </label>
             <p className="text-sm font-mono bg-gray-50 p-2 rounded border">
-              {transaction.merchant_transaction_id}
+              {transaction.merchantTransactionId}
             </p>
           </div>
         )}
 
-        {transaction.upi_transaction_id && (
+        {transaction.upiTransactionId && (
           <div>
             <label className="block text-sm font-medium text-gray-500 mb-1">
               Payment Transaction ID
             </label>
             <p className="text-sm font-mono bg-gray-50 p-2 rounded border">
-              {transaction.upi_transaction_id}
+              {transaction.upiTransactionId}
             </p>
           </div>
         )}
 
-        {transaction.customer_email && (
+        {transaction.customerEmail && (
           <div>
             <label className="block text-sm font-medium text-gray-500 mb-1">
               Customer Email
             </label>
-            <p className="text-sm text-gray-700">{transaction.customer_email}</p>
+            <p className="text-sm text-gray-700">{transaction.customerEmail}</p>
           </div>
         )}
 
-        {transaction.customer_phone && (
+        {transaction.customerPhone && (
           <div>
             <label className="block text-sm font-medium text-gray-500 mb-1">
               Customer Phone
             </label>
-            <p className="text-sm text-gray-700">{transaction.customer_phone}</p>
+            <p className="text-sm text-gray-700">{transaction.customerPhone}</p>
           </div>
         )}
 
-        {transaction.failure_reason && (
+        {transaction.failureReason && (
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-red-600 mb-1">
               Failure Reason
             </label>
             <p className="text-sm text-red-700 bg-red-50 p-2 rounded border border-red-200">
-              {transaction.failure_reason}
+              {transaction.failureReason}
             </p>
           </div>
         )}

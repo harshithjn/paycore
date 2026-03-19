@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -132,6 +134,27 @@ public class PaymentVerificationController {
             response.put("lastVerifiedAt", transaction.getLastVerifiedAt());
             response.put("createdAt", transaction.getCreatedAt());
             response.put("updatedAt", transaction.getUpdatedAt());
+            
+            // Add callback logs
+            List<Map<String, Object>> callbackLogs = statusData.getCallbackLogs().stream()
+                .map(log -> {
+                    Map<String, Object> logMap = new HashMap<>();
+                    logMap.put("id", log.getId());
+                    logMap.put("transactionId", log.getTransactionId());
+                    logMap.put("statusSent", log.getStatusSent());
+                    logMap.put("callbackUrl", log.getCallbackUrl());
+                    logMap.put("responseCode", log.getResponseCode());
+                    logMap.put("responseBody", log.getResponseBody());
+                    logMap.put("timestamp", log.getTimestamp());
+                    logMap.put("retryCount", log.getRetryCount());
+                    return logMap;
+                })
+                .toList();
+            response.put("callbackLogs", callbackLogs);
+            
+            // Add other lists (placeholders for now if models don't exist)
+            response.put("stateTransitions", new ArrayList<>());
+            response.put("verificationAttempts", new ArrayList<>());
             
             Map<String, Object> stateMetadata = new HashMap<>();
             stateMetadata.put("currentState", statusData.getCurrentState());

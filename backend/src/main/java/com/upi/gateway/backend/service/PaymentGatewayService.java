@@ -35,7 +35,7 @@ public class PaymentGatewayService {
         }
         
         String baseUrl = paymentBaseUrl.endsWith("/") ? paymentBaseUrl.substring(0, paymentBaseUrl.length() - 1) : paymentBaseUrl;
-        String paymentLink = String.format("%s/%s", baseUrl, transactionId);
+        String paymentLink = String.format("%s/pay/%s", baseUrl, transactionId);
         String qrCodeData = generateUPIQRString(transaction);
         
         log.info("Generated payment link for transaction: {}", transactionId);

@@ -79,7 +79,7 @@ export const VerificationAttempts: React.FC<VerificationAttemptsProps> = ({
                 {getStatusIcon(attempt.status)}
                 <div>
                   <span className="font-medium text-sm">
-                    {attempt.verification_type} Verification
+                    {attempt.verificationType} Verification
                   </span>
                   <span className={`
                     ml-2 px-2 py-1 text-xs rounded-full border
@@ -97,11 +97,11 @@ export const VerificationAttempts: React.FC<VerificationAttemptsProps> = ({
 
             <div className="mb-3">
               <p className="text-xs text-gray-500 mb-1">
-                Verified at: {formatTimestamp(attempt.verified_at)}
+                Verified at: {formatTimestamp(attempt.verifiedAt)}
               </p>
             </div>
 
-            {attempt.verification_data && Object.keys(attempt.verification_data).length > 0 && (
+            {attempt.verificationData && Object.keys(attempt.verificationData).length > 0 && (
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1">
                   Verification Data
@@ -111,7 +111,7 @@ export const VerificationAttempts: React.FC<VerificationAttemptsProps> = ({
                     Show verification details
                   </summary>
                   <pre className="mt-2 text-xs bg-gray-50 p-3 rounded overflow-x-auto border">
-                    {formatVerificationData(attempt.verification_data)}
+                    {formatVerificationData(attempt.verificationData)}
                   </pre>
                 </details>
               </div>

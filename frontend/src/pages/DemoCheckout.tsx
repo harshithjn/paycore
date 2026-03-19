@@ -90,7 +90,7 @@ export const DemoCheckout: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span>Method</span>
-                <span className="text-[#111] dark:text-[#EAEAEA] font-medium uppercase">{transaction.payment_method}</span>
+                <span className="text-[#111] dark:text-[#EAEAEA] font-medium uppercase">{transaction.paymentMethod}</span>
               </div>
             </div>
             

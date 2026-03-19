@@ -54,13 +54,13 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
         
         const newSuccessTxns = txns.filter(t => 
           t.status === 'SUCCESS' && 
-          new Date(t.created_at || t.updated_at) > lastCheckedTime
+          new Date(t.createdAt || t.updatedAt) > lastCheckedTime
         );
 
         if (newSuccessTxns.length > 0) {
           const newNotifs: Notification[] = newSuccessTxns.map((t: Transaction) => ({
             id: t.id,
-            message: `Successful payment received via ${t.payment_method || 'Link'}`,
+            message: `Successful payment received via ${t.paymentMethod || 'Link'}`,
             amount: t.amount,
             time: new Date(),
             isRead: false

@@ -111,16 +111,16 @@ export const Transactions = () => {
                       ₹{txn.amount.toFixed(2)}
                     </td>
                     <td className="py-3 px-4 text-sm text-[#6B7280]">
-                      {txn.payment_method}
+                      {txn.paymentMethod}
                     </td>
                     <td className="py-3 px-4">
                       <StatusBadge status={txn.status} />
                     </td>
                     <td className="py-3 px-4 text-sm text-[#6B7280]">
-                      {txn.customer_email || txn.customer_phone || '-'}
+                      {txn.customerEmail || txn.customerPhone || '-'}
                     </td>
                     <td className="py-3 px-4 text-sm text-[#6B7280]">
-                      {txn.created_at ? new Date(txn.created_at).toLocaleDateString() : 'N/A'}
+                      {txn.createdAt ? new Date(txn.createdAt).toLocaleDateString() : 'N/A'}
                     </td>
                     <td className="py-3 px-4">
                       <button
@@ -175,7 +175,7 @@ export const Transactions = () => {
                       </div>
                       <div className="flex justify-between py-2">
                         <span className="text-sm text-[#6B7280]">Payment Method</span>
-                        <span className="text-sm text-[#111] dark:text-[#EAEAEA]">{selectedTxn.transaction.payment_method}</span>
+                        <span className="text-sm text-[#111] dark:text-[#EAEAEA]">{selectedTxn.transaction.paymentMethod}</span>
                       </div>
                     </div>
                   </div>
@@ -190,10 +190,10 @@ export const Transactions = () => {
                             <div className="w-2 h-2 rounded-full bg-[#4F46E5] mt-1.5" />
                             <div className="flex-1">
                               <div className="text-sm text-[#111] dark:text-[#EAEAEA]">
-                                {st.from_status && `${st.from_status} → `}{st.to_status}
+                                {st.fromStatus && `${st.fromStatus} → `}{st.toStatus}
                               </div>
                               <div className="text-xs text-[#6B7280] mt-1">
-                                {st.transitioned_at ? new Date(st.transitioned_at).toLocaleString() : 'N/A'}
+                                {st.transitionedAt ? new Date(st.transitionedAt).toLocaleString() : 'N/A'}
                               </div>
                             </div>
                           </div>
@@ -207,7 +207,7 @@ export const Transactions = () => {
                     <div>
                       <h3 className="text-sm font-medium text-[#6B7280] mb-3">Callback Status</h3>
                       <div className="text-sm text-[#111] dark:text-[#EAEAEA]">
-                        {selectedTxn.transaction.callback_sent ? 'Callback sent successfully' : 'Pending'}
+                        {selectedTxn.transaction.callbackSent ? 'Callback sent successfully' : 'Pending'}
                       </div>
                     </div>
                   )}

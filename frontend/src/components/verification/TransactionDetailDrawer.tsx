@@ -191,9 +191,9 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
                         Payment Method
                       </label>
                       <div className="flex items-center space-x-2">
-                        {getPaymentMethodIcon(statusData.transaction.payment_method)}
+                        {getPaymentMethodIcon(statusData.transaction.paymentMethod)}
                         <span className="font-medium">
-                          {statusData.transaction.payment_method}
+                          {statusData.transaction.paymentMethod}
                         </span>
                       </div>
                     </div>
@@ -203,13 +203,13 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
                         Callback Status
                       </label>
                       <div className="flex items-center space-x-2">
-                        {statusData.transaction.callback_sent ? (
+                        {statusData.transaction.callbackSent ? (
                           <CheckCircle className="w-4 h-4 text-green-500" />
                         ) : (
                           <Clock className="w-4 h-4 text-gray-500" />
                         )}
                         <span className="text-sm">
-                          {statusData.transaction.callback_sent ? 'Sent' : 'Pending'}
+                          {statusData.transaction.callbackSent ? 'Sent' : 'Pending'}
                         </span>
                       </div>
                     </div>

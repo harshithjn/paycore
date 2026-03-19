@@ -34,6 +34,7 @@ public class PaymentVerificationService implements TransactionSubject {
     private final TransactionRepository transactionRepository;
     private final TransactionStateFactory stateFactory;
     private final VerificationFactory verificationFactory;
+    private final com.upi.gateway.backend.repository.CallbackLogRepository callbackLogRepository;
     private final List<TransactionObserver> observers = new ArrayList<>();
     
     @Override
@@ -211,6 +212,9 @@ public class PaymentVerificationService implements TransactionSubject {
         
         TransactionStateHandler stateHandler = stateFactory.getHandler(currentState);
         
+        List<com.upi.gateway.backend.model.CallbackLog> logs = 
+            callbackLogRepository.findByTransactionIdOrderByTimestampDesc(transactionId);
+        
         return TransactionStatusData.builder()
                 .transaction(transaction)
                 .currentState(currentState)
@@ -218,6 +222,7 @@ public class PaymentVerificationService implements TransactionSubject {
                 .isTerminal(stateHandler.isTerminal())
                 .allowsVerification(stateHandler.allowsVerification())
                 .validNextStates(stateHandler.getValidNextStates())
+                .callbackLogs(logs)
                 .build();
     }
     
@@ -233,5 +238,6 @@ public class PaymentVerificationService implements TransactionSubject {
         private boolean isTerminal;
         private boolean allowsVerification;
         private List<String> validNextStates;
+        private List<com.upi.gateway.backend.model.CallbackLog> callbackLogs;
     }
 }

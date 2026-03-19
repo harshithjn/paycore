@@ -157,7 +157,7 @@ export const Refunds = () => {
                       <StatusBadge status={txn.status} />
                     </td>
                     <td className="py-3 px-4 text-sm text-[#6B7280]">
-                      {txn.created_at ? new Date(txn.created_at).toLocaleDateString() : 'N/A'}
+                      {txn.createdAt ? new Date(txn.createdAt).toLocaleDateString() : 'N/A'}
                     </td>
                     <td className="py-3 px-4">
                       <button

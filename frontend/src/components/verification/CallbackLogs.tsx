@@ -67,13 +67,13 @@ export const CallbackLogs: React.FC<CallbackLogsProps> = ({ callbackLogs }) => {
           <div key={log.id} className="border border-gray-200 rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
-                {getStatusIcon(log.response_code)}
+                {getStatusIcon(log.responseCode)}
                 <span className="font-medium text-sm">
-                  Status: {log.status_sent}
+                  Status: {log.statusSent}
                 </span>
-                {log.response_code && (
-                  <span className={`text-sm font-mono ${getStatusColor(log.response_code)}`}>
-                    HTTP {log.response_code}
+                {log.responseCode && (
+                  <span className={`text-sm font-mono ${getStatusColor(log.responseCode)}`}>
+                    HTTP {log.responseCode}
                   </span>
                 )}
               </div>
@@ -83,32 +83,32 @@ export const CallbackLogs: React.FC<CallbackLogsProps> = ({ callbackLogs }) => {
               </div>
             </div>
 
-            {log.callback_url && (
+            {log.callbackUrl && (
               <div className="mb-2">
                 <label className="block text-xs font-medium text-gray-500 mb-1">
                   Callback URL
                 </label>
                 <p className="text-sm font-mono bg-gray-50 p-2 rounded break-all">
-                  {log.callback_url}
+                  {log.callbackUrl}
                 </p>
               </div>
             )}
 
-            {log.response_body && (
+            {log.responseBody && (
               <div className="mb-2">
                 <label className="block text-xs font-medium text-gray-500 mb-1">
                   Response
                 </label>
                 <pre className="text-xs bg-gray-50 p-2 rounded overflow-x-auto">
-                  {formatResponseBody(log.response_body)}
+                  {formatResponseBody(log.responseBody)}
                 </pre>
               </div>
             )}
 
-            {log.retry_count > 0 && (
+            {log.retryCount > 0 && (
               <div className="flex items-center space-x-1 text-xs text-orange-600">
                 <Clock className="w-3 h-3" />
-                <span>Retried {log.retry_count} times</span>
+                <span>Retried {log.retryCount} times</span>
               </div>
             )}
           </div>

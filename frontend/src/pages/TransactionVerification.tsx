@@ -77,8 +77,8 @@ export const TransactionVerification = () => {
     if (searchTerm) {
       filtered = filtered.filter(transaction =>
         transaction.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        transaction.merchant_transaction_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        transaction.customer_email?.toLowerCase().includes(searchTerm.toLowerCase())
+        transaction.merchantTransactionId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        transaction.customerEmail?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -87,7 +87,7 @@ export const TransactionVerification = () => {
     }
 
     if (paymentMethodFilter) {
-      filtered = filtered.filter(t => t.payment_method === paymentMethodFilter);
+      filtered = filtered.filter(t => t.paymentMethod === paymentMethodFilter);
     }
 
     setFilteredTransactions(filtered);
@@ -248,9 +248,9 @@ export const TransactionVerification = () => {
                           <div className="text-sm font-medium text-[#111] dark:text-[#EAEAEA] font-mono">
                             {transaction.id.substring(0, 8)}...
                           </div>
-                          {transaction.merchant_transaction_id && (
+                          {transaction.merchantTransactionId && (
                             <div className="text-xs text-[#6B7280]">
-                              {transaction.merchant_transaction_id}
+                              {transaction.merchantTransactionId}
                             </div>
                           )}
                         </div>
@@ -265,22 +265,22 @@ export const TransactionVerification = () => {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
-                          {getPaymentMethodIcon(transaction.payment_method)}
+                          {getPaymentMethodIcon(transaction.paymentMethod)}
                           <span className="text-sm text-[#111] dark:text-[#EAEAEA]">
-                            {transaction.payment_method}
+                            {transaction.paymentMethod}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
-                          {getCallbackStatusIcon(transaction.callback_sent)}
+                          {getCallbackStatusIcon(transaction.callbackSent)}
                           <span className="text-sm text-[#6B7280]">
-                            {transaction.callback_sent ? 'Sent' : 'Pending'}
+                            {transaction.callbackSent ? 'Sent' : 'Pending'}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-[#6B7280]">
-                        {formatDate(transaction.created_at)}
+                        {formatDate(transaction.createdAt)}
                       </td>
                       <td className="px-6 py-4">
                         <Button
