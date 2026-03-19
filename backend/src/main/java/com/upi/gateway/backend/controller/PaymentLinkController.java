@@ -24,6 +24,9 @@ public class PaymentLinkController {
     private final PaymentLinkService paymentLinkService;
     private final MerchantService merchantService;
 
+    @org.springframework.beans.factory.annotation.Value("${payment.link.base-url:}")
+    private String baseUrl;
+
     // ===== API Key authenticated endpoints (for developers) =====
 
     @PostMapping("/v1/payment-links")
@@ -47,9 +50,14 @@ public class PaymentLinkController {
 
             PaymentLink link = paymentLinkService.createLink(merchant.getId(), title, description, amount, isReusable);
 
-            String payUrl = request.getScheme() + "://" + request.getServerName()
-                    + (request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "")
-                    + "/pay/link/" + link.getLinkCode();
+            String payUrl;
+            if (baseUrl != null && !baseUrl.isEmpty()) {
+                payUrl = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + "pay/link/" + link.getLinkCode();
+            } else {
+                payUrl = request.getScheme() + "://" + request.getServerName()
+                        + (request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "")
+                        + "/pay/link/" + link.getLinkCode();
+            }
 
             Map<String, Object> response = Map.of(
                     "id", link.getId(),
