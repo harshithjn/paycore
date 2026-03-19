@@ -1,68 +1,113 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@font-face {
+  font-family: "Matter Regular";
+  src: url("https://db.onlinewebfonts.com/t/f56809563b15c7c76669dac9ca9d38ac.woff2") format("woff2");
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+@layer base {
+  body {
+    @apply bg-[#FAFAFA] dark:bg-[#0B0B0C] text-[#111] dark:text-[#EAEAEA];
+    font-family: "Matter Regular", -apple-system, BlinkMacSystemFont, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  a:hover {
-    color: #747bff;
+  
+  * {
+    font-family: "Matter Regular", -apple-system, BlinkMacSystemFont, sans-serif;
   }
-  button {
-    background-color: #f9f9f9;
+}
+
+@layer components {
+  .card {
+    @apply bg-white dark:bg-[#1A1A1A] rounded-lg border border-[#E5E7EB] dark:border-[#2A2A2A];
   }
+  
+  .btn-primary {
+    @apply bg-[#4F46E5] hover:bg-[#4338CA] text-white px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-secondary {
+    @apply border border-[#E5E7EB] dark:border-[#2A2A2A] hover:bg-[#F9FAFB] dark:hover:bg-[#1A1A1A] text-[#111] dark:text-[#EAEAEA] px-4 py-2 rounded-lg transition-all duration-200;
+  }
+  
+  .status-badge {
+    @apply px-2.5 py-1 rounded-md text-xs font-medium;
+  }
+  
+  .status-success {
+    @apply bg-[#ECFDF5] text-[#059669] dark:bg-[#064E3B] dark:bg-opacity-30 dark:text-[#34D399];
+  }
+  
+  .status-failed {
+    @apply bg-[#FEF2F2] text-[#DC2626] dark:bg-[#7F1D1D] dark:bg-opacity-30 dark:text-[#F87171];
+  }
+  
+  .status-processing {
+    @apply bg-[#FEF3C7] text-[#D97706] dark:bg-[#78350F] dark:bg-opacity-30 dark:text-[#FCD34D];
+  }
+  
+  .status-pending {
+    @apply bg-[#F3F4F6] text-[#6B7280] dark:bg-[#374151] dark:bg-opacity-30 dark:text-[#9CA3AF];
+  }
+  
+  .status-refunded {
+    @apply bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#5B21B6] dark:bg-opacity-30 dark:text-[#C4B5FD];
+  }
+  
+  .status-settled {
+    @apply bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:bg-opacity-30 dark:text-[#93C5FD];
+  }
+  
+  .input-field {
+    @apply w-full px-3 py-2 border border-[#E5E7EB] dark:border-[#2A2A2A] rounded-lg bg-white dark:bg-[#1A1A1A] text-[#111] dark:text-[#EAEAEA] focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent transition-all duration-200;
+  }
+  
+  .table-row {
+    @apply border-b border-[#E5E7EB] dark:border-[#2A2A2A] hover:bg-[#F9FAFB] dark:hover:bg-[#1A1A1A] transition-colors duration-150;
+  }
+}
+
+/* Smooth transitions */
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 200ms ease-in;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+
+/* Skeleton loader */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(to right, #F3F4F6 4%, #E5E7EB 25%, #F3F4F6 36%);
+  background-size: 1000px 100%;
+}
+
+.dark .skeleton {
+  background: linear-gradient(to right, #1A1A1A 4%, #2A2A2A 25%, #1A1A1A 36%);
+  background-size: 1000px 100%;
 }

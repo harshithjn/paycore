@@ -16,5 +16,10 @@ public class MerchantRegisterRequest {
     private String email;
 
     @NotBlank
+    private String password;
+
+    @NotBlank
     private String businessName;
+
+    private String phone;
 }
