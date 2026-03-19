@@ -122,4 +122,18 @@ public class MerchantController {
         }
     }
 
+    /**
+     * POST /api/merchant/{merchantId}/regenerate-key
+     * Regenerate the merchant's API key
+     */
+    @PostMapping("/{merchantId}/regenerate-key")
+    public ResponseEntity<?> regenerateApiKey(@PathVariable Long merchantId) {
+        try {
+            String newApiKey = merchantService.regenerateApiKey(merchantId);
+            return ResponseEntity.ok(Map.of("apiKey", newApiKey, "message", "API key regenerated successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

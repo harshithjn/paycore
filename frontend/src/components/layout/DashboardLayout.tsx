@@ -8,7 +8,8 @@ import {
   FileText, 
   Key, 
   Settings,
-  LogOut
+  LogOut,
+  Code
 } from 'lucide-react';
 import { useMerchant } from '../../context/MerchantContext';
 import { NotificationProvider } from '../../context/NotificationContext';
@@ -41,6 +42,7 @@ export const DashboardLayout = () => {
     { path: 'settlements', label: 'Settlements', icon: Wallet },
     { path: 'reports', label: 'Reports', icon: FileText },
     { path: 'api-keys', label: 'API Keys', icon: Key },
+    { path: 'developer', label: 'Developer Portal', icon: Code },
     { path: 'settings', label: 'Settings', icon: Settings },
   ];
 

@@ -146,3 +146,32 @@ export interface ApiKey {
   lastUsed?: string;
   isActive: boolean;
 }
+
+export interface PaymentLink {
+  id: string;
+  merchantId: number;
+  linkCode: string;
+  title: string;
+  description?: string;
+  amount: number;
+  currency: string;
+  isReusable: boolean;
+  status: 'ACTIVE' | 'INACTIVE';
+  paymentCount: number;
+  totalCollected: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ApiLog {
+  id: number;
+  merchantId: number;
+  apiKey: string;
+  method: string;
+  endpoint: string;
+  statusCode: number;
+  requestBody?: string;
+  responseSummary?: string;
+  ipAddress?: string;
+  createdAt: string;
+}

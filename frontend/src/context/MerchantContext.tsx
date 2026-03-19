@@ -7,13 +7,14 @@ export interface MerchantProfile {
   email: string;
   phone?: string;
   businessName?: string;
+  apiKey?: string;
 }
 
 interface MerchantContextType {
   merchant: MerchantProfile | null;
   login: (profile: MerchantProfile) => void;
   logout: () => void;
-  updateProfile: (updates: Partial<MerchantProfile>) => void;
+  updateMerchant: (updates: Partial<MerchantProfile>) => void;
 }
 
 const MerchantContext = createContext<MerchantContextType | undefined>(undefined);
@@ -34,12 +35,12 @@ export const MerchantProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const login = (profile: MerchantProfile) => setMerchant(profile);
   const logout = () => setMerchant(null);
-  const updateProfile = (updates: Partial<MerchantProfile>) => {
+  const updateMerchant = (updates: Partial<MerchantProfile>) => {
     setMerchant(prev => prev ? { ...prev, ...updates } : null);
   };
 
   return (
-    <MerchantContext.Provider value={{ merchant, login, logout, updateProfile }}>
+    <MerchantContext.Provider value={{ merchant, login, logout, updateMerchant }}>
       {children}
     </MerchantContext.Provider>
   );

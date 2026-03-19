@@ -2,6 +2,7 @@ package com.upi.gateway.backend.service;
 
 import com.upi.gateway.backend.dto.MerchantLoginRequest;
 import com.upi.gateway.backend.dto.MerchantLoginResponse;
+import com.upi.gateway.backend.exception.AuthException;
 import com.upi.gateway.backend.dto.MerchantRegisterRequest;
 import com.upi.gateway.backend.dto.MerchantSettingsRequest;
 import com.upi.gateway.backend.dto.MerchantSettingsResponse;
@@ -50,14 +51,14 @@ public class MerchantService {
 
     public MerchantLoginResponse login(MerchantLoginRequest request) {
         Merchant merchant = merchantRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+                .orElseThrow(() -> new AuthException("Invalid credentials"));
 
         if (!merchant.getPassword().equals(request.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new AuthException("Invalid credentials");
         }
 
-        if (!merchant.getIsActive()) {
-            throw new RuntimeException("Merchant is not active");
+        if (merchant.getIsActive() != null && !merchant.getIsActive()) {
+            throw new AuthException("Merchant is not active");
         }
 
         return new MerchantLoginResponse(merchant.getId(), "Login successful");
@@ -126,6 +127,23 @@ public class MerchantService {
         merchantRepository.save(merchant);
 
         return getSettings(merchantId);
+    }
+
+    public Optional<Merchant> findByApiKey(String apiKey) {
+        return merchantRepository.findByApiKey(apiKey);
+    }
+
+    @Transactional
+    public String regenerateApiKey(Long merchantId) {
+        Merchant merchant = merchantRepository.findById(merchantId)
+                .orElseThrow(() -> new IllegalArgumentException("Merchant not found"));
+
+        String newApiKey = "pk_" + UUID.randomUUID().toString().replace("-", "");
+        merchant.setApiKey(newApiKey);
+        merchantRepository.save(merchant);
+
+        log.info("Regenerated API key for merchant {}", merchantId);
+        return newApiKey;
     }
 
 }

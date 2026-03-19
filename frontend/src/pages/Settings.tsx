@@ -4,7 +4,7 @@ import { Toast } from '../components/ui/Toast';
 import { useMerchant } from '../context/MerchantContext';
 
 export const Settings = () => {
-  const { merchant, updateProfile } = useMerchant();
+  const { merchant, updateMerchant } = useMerchant();
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   
   const [settings, setSettings] = useState({
@@ -29,7 +29,7 @@ export const Settings = () => {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    updateProfile({ name: settings.businessName, email: settings.email, phone: settings.phone, businessName: settings.businessName });
+    updateMerchant({ name: settings.businessName, email: settings.email, phone: settings.phone, businessName: settings.businessName });
     setToast({ message: 'Settings saved successfully', type: 'success' });
   };
 

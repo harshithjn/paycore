@@ -15,10 +15,12 @@ import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { CustomerPayment } from './pages/CustomerPayment';
 import { LandingPage } from './pages/LandingPage';
+import { DeveloperPortal } from './pages/DeveloperPortal.tsx';
+import { PaymentLinkCheckout } from './pages/PaymentLinkCheckout.tsx';
 
 function App() {
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Routes>
           {/* Public Auth Routes */}
@@ -30,6 +32,7 @@ function App() {
           
           {/* Public Payment Link Route */}
           <Route path="/pay/:transactionId" element={<CustomerPayment />} />
+          <Route path="/pay/link/:linkCode" element={<PaymentLinkCheckout />} />
           
           {/* Standalone Pages */}
           <Route path="/merchant/:merchantId/payment-initiation" element={<PaymentInitiation />} />
@@ -44,6 +47,7 @@ function App() {
             <Route path="settlements" element={<Settlements />} />
             <Route path="reports" element={<Reports />} />
             <Route path="api-keys" element={<ApiKeys />} />
+            <Route path="developer" element={<DeveloperPortal />} />
             <Route path="settings" element={<Settings />} />
             
             {/* Default redirect to dashboard */}
