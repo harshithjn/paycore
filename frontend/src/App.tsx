@@ -17,11 +17,14 @@ import { CustomerPayment } from './pages/CustomerPayment';
 import { LandingPage } from './pages/LandingPage';
 import { DeveloperPortal } from './pages/DeveloperPortal.tsx';
 import { PaymentLinkCheckout } from './pages/PaymentLinkCheckout.tsx';
+import { NotFound } from './pages/NotFound';
+import { Analytics } from '@vercel/analytics/react';
 
 function App() {
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Analytics />
         <Routes>
           {/* Public Auth Routes */}
           <Route path="/login" element={<Login />} />
@@ -55,7 +58,7 @@ function App() {
           </Route>
           
           {/* Catch all route */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </Router>
