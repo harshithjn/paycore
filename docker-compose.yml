@@ -1,17 +1,18 @@
+version: '3.8'
+
 services:
   db:
     image: postgres:16-alpine
     container_name: paycore-db
+    restart: always
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-paycore}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-paycore}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -19,22 +20,34 @@ services:
   backend:
     build: ./backend
     container_name: paycore-backend
+    restart: always
     depends_on:
       db:
         condition: service_healthy
     environment:
-      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-paycore}
-      DB_USERNAME: ${POSTGRES_USER:-postgres}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-password}
-      DB_DDL_AUTO: update
-      PAYMENT_LINK_BASE_URL: ${PAYMENT_LINK_BASE_URL:-http://localhost}
-    ports:
-      - "8081:8081"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      PAYMENT_LINK_BASE_URL: ${PAYMENT_LINK_BASE_URL}
+    expose:
+      - "8081"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  nginx:
+    image: nginx:latest
+    container_name: paycore-nginx
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
 
 volumes:
   postgres_data:
