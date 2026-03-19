@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '../ui/Card';
 import { StatusBadge, type Status } from '../ui/StatusBadge';
 import { Button } from '../ui/Button';
+import { apiFetch } from '../../lib/api';
 
 interface CallbackLog {
   id: string;
@@ -30,7 +31,7 @@ export const CallbackLogs: React.FC<CallbackLogsProps> = ({ transactionId }) => 
   const fetchCallbackLogs = async () => {
     setLoading(true);
     try {
-      let url = 'http://localhost:8081/api/callbacks';
+      let url = '/api/callbacks';
       
       if (transactionId) {
         url += `/transaction/${transactionId}`;
@@ -40,7 +41,7 @@ export const CallbackLogs: React.FC<CallbackLogsProps> = ({ transactionId }) => 
         url += '/all';
       }
 
-      const response = await fetch(url);
+      const response = await apiFetch(url);
       if (response.ok) {
         const data = await response.json();
         setLogs(data);

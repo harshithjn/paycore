@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { paymentApi } from '../api/paymentApi';
+import { apiFetch } from '../lib/api';
 import type { Transaction } from '../types';
 import { Toast } from '../components/ui/Toast';
 import { CreditCard, Smartphone, Building, CheckCircle, XCircle } from 'lucide-react';
@@ -52,9 +53,8 @@ export const CustomerPayment = () => {
     setProcessing(true);
 
     try {
-      const response = await fetch('http://localhost:8081/api/gateway/pay/card', {
+      const response = await apiFetch('/api/gateway/pay/card', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           transactionId,
           ...cardData,
@@ -82,9 +82,8 @@ export const CustomerPayment = () => {
     setProcessing(true);
 
     try {
-      const response = await fetch('http://localhost:8081/api/gateway/pay/upi', {
+      const response = await apiFetch('/api/gateway/pay/upi', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           transactionId,
           ...upiData,
