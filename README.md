@@ -25,7 +25,7 @@ Ensure Docker Desktop is running, then execute:
 ```bash
 docker compose up -d
 ```
-The application will be accessible at [https://paycore.harshithj.me](https://paycore.harshithj.me) or [http://localhost](http://localhost).
+The application will be accessible at [https://paycore.harshithj.me](https://paycore.harshithj.me) 
 
 ### Tech Stack
 - **Frontend**: React, TypeScript, Tailwind CSS, Vite
@@ -41,7 +41,4 @@ The application will be accessible at [https://paycore.harshithj.me](https://pay
 
 ---
 © 2026 PayCore Project
- State-driven architecture
-- Real-time system design
-- Professional UI/UX for fintech applications
-- Comprehensive audit logging and monitoring
+
