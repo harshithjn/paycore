@@ -13,7 +13,7 @@ export const PaymentLinkCheckout = () => {
   const [processing, setProcessing] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const [paymentComplete, setPaymentComplete] = useState(false);
-  
+
   const [customerData, setCustomerData] = useState({
     email: '',
     phone: '',
@@ -37,7 +37,7 @@ export const PaymentLinkCheckout = () => {
 
   const fetchLinkDetails = async () => {
     if (!linkCode) return;
-    
+
     try {
       const data = await developerApi.getLinkDetails(linkCode);
       setLinkDetails(data);
@@ -51,7 +51,7 @@ export const PaymentLinkCheckout = () => {
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!linkCode) return;
-    
+
     setProcessing(true);
 
     try {
@@ -126,7 +126,6 @@ export const PaymentLinkCheckout = () => {
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#0B0B0C] py-12 px-4">
       <div className="max-w-md mx-auto">
-        {/* Merchant Branding */}
         <div className="flex items-center gap-3 mb-8 justify-center">
           <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-200 dark:shadow-none">
             {linkDetails.merchantName.charAt(0)}
@@ -134,11 +133,10 @@ export const PaymentLinkCheckout = () => {
           <h1 className="text-xl font-semibold text-[#111] dark:text-[#EAEAEA]">{linkDetails.merchantName}</h1>
         </div>
 
-        {/* Payment Summary */}
         <div className="card p-8 mb-8 shadow-sm border-[#E5E7EB] dark:border-[#2A2A2A]">
           <h2 className="text-lg font-medium text-[#111] dark:text-[#EAEAEA] mb-1">{linkDetails.title}</h2>
           <p className="text-sm text-[#6B7280] mb-6">{linkDetails.description || 'Secure payment via PayCore'}</p>
-          
+
           <div className="flex items-baseline gap-1 mb-8">
              <span className="text-4xl font-bold text-[#111] dark:text-[#EAEAEA]">₹{linkDetails.amount.toFixed(2)}</span>
              <span className="text-sm text-[#6B7280] font-medium uppercase tracking-wider">{linkDetails.currency}</span>
@@ -147,8 +145,8 @@ export const PaymentLinkCheckout = () => {
           <div className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-[#6B7280] uppercase mb-1.5">Your Email</label>
-              <input 
-                type="email" 
+              <input
+                type="email"
                 placeholder="customer@example.com"
                 value={customerData.email}
                 onChange={(e) => setCustomerData({ ...customerData, email: e.target.value })}
@@ -158,11 +156,10 @@ export const PaymentLinkCheckout = () => {
           </div>
         </div>
 
-        {/* Payment Methods */}
         {!paymentMethod && (
           <div className="space-y-3 animate-in slide-in-from-bottom-4 duration-300">
             <h3 className="text-xs font-bold text-[#6B7280] uppercase tracking-widest px-1">Select Payment Method</h3>
-            
+
             <button
               onClick={() => setPaymentMethod('upi')}
               className="w-full flex items-center gap-4 p-5 bg-white dark:bg-[#111] border border-[#E5E7EB] dark:border-[#2A2A2A] rounded-2xl hover:border-indigo-500 dark:hover:border-indigo-500 transition-all group"
@@ -204,7 +201,6 @@ export const PaymentLinkCheckout = () => {
           </div>
         )}
 
-        {/* Card Form */}
         {paymentMethod === 'card' && (
           <div className="card p-8 animate-in slide-in-from-right-4 duration-300">
             <button
@@ -245,7 +241,6 @@ export const PaymentLinkCheckout = () => {
           </div>
         )}
 
-        {/* UPI Form */}
         {paymentMethod === 'upi' && (
           <div className="card p-8 animate-in slide-in-from-right-4 duration-300">
             <button
@@ -258,15 +253,15 @@ export const PaymentLinkCheckout = () => {
             <form onSubmit={handlePayment} className="space-y-6">
               <div className="flex flex-col items-center justify-center p-6 bg-[#F9FAFB] dark:bg-[#1A1A1A] rounded-2xl border-2 border-dashed border-[#E5E7EB] dark:border-[#2A2A2A] mb-4">
                 <div className="bg-white p-3 rounded-xl mb-4 shadow-sm">
-                   <img 
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=paycore@demo&am=${linkDetails.amount}&cu=INR`} 
-                    alt="UPI QR" 
+                   <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=paycore@demo&am=${linkDetails.amount}&cu=INR`}
+                    alt="UPI QR"
                     className="w-32 h-32"
                    />
                 </div>
                 <p className="text-xs text-[#6B7280] text-center">Scan QR with any UPI app to pay</p>
               </div>
-              
+
               <div className="relative flex items-center mb-6">
                 <div className="flex-grow border-t border-[#E5E7EB] dark:border-[#2A2A2A]"></div>
                 <span className="flex-shrink mx-4 text-xs font-bold text-[#6B7280] uppercase tracking-widest">or enter VPA</span>
@@ -290,7 +285,6 @@ export const PaymentLinkCheckout = () => {
           </div>
         )}
 
-        {/* Net Banking Form */}
         {paymentMethod === 'netbanking' && (
           <div className="card p-8 animate-in slide-in-from-right-4 duration-300">
             <button

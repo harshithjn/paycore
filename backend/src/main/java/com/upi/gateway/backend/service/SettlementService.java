@@ -25,45 +25,41 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class SettlementService {
-    
+
     private final TransactionRepository transactionRepository;
     private final SettlementRepository settlementRepository;
     private final SettlementTransactionRepository settlementTransactionRepository;
     private final List<SettlementCalculator> settlementCalculators;
     private final SettlementEngine settlementEngine;
-    
+
     @Transactional
     public SettlementResponse processSettlement(SettlementRequest request) {
         log.info("Processing settlement request: {}", request);
-        
-        // 1. Select appropriate calculator (Strategy Pattern)
+
         SettlementCalculator calculator = settlementCalculators.stream()
                 .filter(c -> c.supports(request.getType()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unsupported settlement type: " + request.getType()));
-        
-        // 2. Get period boundaries
+
         LocalDateTime[] period = calculator.getPeriodBoundaries();
         LocalDateTime periodStart = period[0];
         LocalDateTime periodEnd = period[1];
-        
-        // 3. Check for duplicate settlement (idempotency)
+
         if (settlementRepository.existsByMerchantIdAndPeriodStartAndPeriodEnd(
                 request.getMerchantId(), periodStart, periodEnd)) {
             throw new IllegalStateException("Settlement already exists for this period");
         }
-        
-        // 4. Fetch eligible transactions
+
         List<Transaction> eligibleTransactions = transactionRepository
                 .findByMerchantIdAndStatusOrderByCreatedAtDesc(
-                        request.getMerchantId(), 
+                        request.getMerchantId(),
                         Transaction.TransactionStatus.SUCCESS
                 )
                 .stream()
                 .filter(t -> !settlementTransactionRepository.existsByTransactionId(t.getId()))
                 .filter(t -> t.getCreatedAt().isAfter(periodStart) && t.getCreatedAt().isBefore(periodEnd))
                 .collect(Collectors.toList());
-        
+
         if (eligibleTransactions.isEmpty()) {
             return SettlementResponse.builder()
                     .merchantId(request.getMerchantId())
@@ -71,11 +67,9 @@ public class SettlementService {
                     .message("No eligible transactions found for settlement")
                     .build();
         }
-        
-        // 5. Calculate settlement using calculator
+
         BigDecimal grossAmount = calculator.calculate(eligibleTransactions);
-        
-        // 6. Validate using Singleton engine
+
         if (!settlementEngine.validateSettlement(grossAmount, eligibleTransactions)) {
             return SettlementResponse.builder()
                     .merchantId(request.getMerchantId())
@@ -83,11 +77,9 @@ public class SettlementService {
                     .message("Settlement validation failed")
                     .build();
         }
-        
-        // 7. Calculate net amount
+
         BigDecimal netAmount = settlementEngine.calculateNetSettlement(grossAmount);
-        
-        // 8. Create settlement record
+
         Settlement settlement = Settlement.builder()
                 .merchantId(request.getMerchantId())
                 .amount(netAmount)
@@ -99,25 +91,24 @@ public class SettlementService {
                 .referenceNumber(settlementEngine.generateReferenceNumber(request.getMerchantId(), request.getType()))
                 .processedAt(LocalDateTime.now())
                 .build();
-        
+
         Settlement savedSettlement = settlementRepository.save(settlement);
-        
-        // 9. Link transactions to settlement and mark as SETTLED
+
         for (Transaction transaction : eligibleTransactions) {
             SettlementTransaction st = SettlementTransaction.builder()
                     .settlementId(savedSettlement.getId())
                     .transactionId(transaction.getId())
                     .build();
             settlementTransactionRepository.save(st);
-            
+
             transaction.setStatus(Transaction.TransactionStatus.SETTLED);
             transactionRepository.save(transaction);
         }
-        
+
         log.info("Settlement processed successfully: {}", savedSettlement.getId());
-        
+
         BigDecimal platformFee = grossAmount.subtract(netAmount);
-        
+
         return SettlementResponse.builder()
                 .settlementId(savedSettlement.getId())
                 .merchantId(savedSettlement.getMerchantId())
@@ -135,30 +126,30 @@ public class SettlementService {
                 .message("Settlement processed successfully")
                 .build();
     }
-    
+
     public List<SettlementResponse> getSettlementsByMerchant(Long merchantId) {
         List<Settlement> settlements = settlementRepository.findByMerchantIdOrderByCreatedAtDesc(merchantId);
-        
+
         return settlements.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
-    
+
     public List<SettlementResponse> getAllSettlements() {
         List<Settlement> settlements = settlementRepository.findAll();
-        
+
         return settlements.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
-    
+
     public SettlementResponse getSettlementById(UUID settlementId) {
         Settlement settlement = settlementRepository.findById(settlementId)
                 .orElseThrow(() -> new IllegalArgumentException("Settlement not found: " + settlementId));
-        
+
         return mapToResponse(settlement);
     }
-    
+
     private SettlementResponse mapToResponse(Settlement settlement) {
         return SettlementResponse.builder()
                 .settlementId(settlement.getId())

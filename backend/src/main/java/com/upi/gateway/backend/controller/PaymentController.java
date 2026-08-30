@@ -17,11 +17,10 @@ import java.util.UUID;
 @RequestMapping("/api/payment")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
 public class PaymentController {
-    
+
     private final PaymentService paymentService;
-    
+
     @PostMapping("/initiate")
     public ResponseEntity<PaymentInitiateResponse> initiatePayment(
             @Valid @RequestBody PaymentInitiateRequest request) {
@@ -37,7 +36,7 @@ public class PaymentController {
             return ResponseEntity.internalServerError().build();
         }
     }
-    
+
     @GetMapping("/status/{transactionId}")
     public ResponseEntity<TransactionStatusResponse> getTransactionStatus(
             @PathVariable UUID transactionId) {
@@ -45,14 +44,14 @@ public class PaymentController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-    
+
     @GetMapping("/merchant/{merchantId}/transactions")
     public ResponseEntity<List<TransactionStatusResponse>> getMerchantTransactions(
             @PathVariable Long merchantId) {
         List<TransactionStatusResponse> transactions = paymentService.getMerchantTransactions(merchantId);
         return ResponseEntity.ok(transactions);
     }
-    
+
     @GetMapping("/methods")
     public ResponseEntity<List<String>> getAvailablePaymentMethods() {
         List<String> methods = paymentService.getAvailablePaymentMethods();

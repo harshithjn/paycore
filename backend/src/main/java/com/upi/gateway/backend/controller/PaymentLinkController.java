@@ -17,7 +17,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class PaymentLinkController {
 
@@ -26,8 +25,6 @@ public class PaymentLinkController {
 
     @org.springframework.beans.factory.annotation.Value("${payment.link.base-url:}")
     private String baseUrl;
-
-    // ===== API Key authenticated endpoints (for developers) =====
 
     @PostMapping("/v1/payment-links")
     public ResponseEntity<?> createLinkViaApi(
@@ -122,8 +119,6 @@ public class PaymentLinkController {
         }
     }
 
-    // ===== Public endpoints (for customers) =====
-
     @GetMapping("/v1/payment-links/{linkCode}")
     public ResponseEntity<?> getLinkPublic(@PathVariable String linkCode) {
         try {
@@ -168,8 +163,6 @@ public class PaymentLinkController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
-
-    // ===== Dashboard endpoints (session-based) =====
 
     @GetMapping("/merchant/{merchantId}/payment-links")
     public ResponseEntity<List<PaymentLink>> getMerchantLinks(@PathVariable Long merchantId) {

@@ -6,12 +6,12 @@ import { CallbackLogs } from './CallbackLogs';
 import { VerificationAttempts } from './VerificationAttempts';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { Toast } from '../ui/Toast';
-import { 
-  X, 
-  RefreshCw, 
-  Shield, 
-  CreditCard, 
-  Smartphone, 
+import {
+  X,
+  RefreshCw,
+  Shield,
+  CreditCard,
+  Smartphone,
   Building,
   CheckCircle,
   XCircle,
@@ -59,18 +59,17 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
     setIsVerifying(true);
     try {
       await verificationApi.verifyTransaction(transactionId);
-      
+
       setToast({ message: 'Verification started successfully', type: 'success' });
 
-      // Reload status after verification
       setTimeout(() => {
         loadTransactionStatus();
       }, 2000);
 
     } catch (error: any) {
-      setToast({ 
-        message: error.response?.data?.error || 'Failed to verify transaction', 
-        type: 'error' 
+      setToast({
+        message: error.response?.data?.error || 'Failed to verify transaction',
+        type: 'error'
       });
     } finally {
       setIsVerifying(false);
@@ -116,16 +115,15 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose} />
-      
+
       <div className="absolute right-0 top-0 h-full w-full max-w-4xl bg-white shadow-xl">
         <div className="flex h-full flex-col">
-          {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
             <div className="flex items-center space-x-3">
               <Shield className="w-6 h-6 text-blue-600" />
               <h2 className="text-xl font-semibold">Transaction Details</h2>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <Button
                 onClick={loadTransactionStatus}
@@ -136,7 +134,7 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
                 <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
-              
+
               <button
                 onClick={onClose}
                 className="p-2 hover:bg-gray-100 rounded-full"
@@ -146,7 +144,6 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
             </div>
           </div>
 
-          {/* Content */}
           <div className="flex-1 overflow-y-auto">
             {isLoading ? (
               <div className="flex items-center justify-center h-64">
@@ -155,7 +152,6 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
               </div>
             ) : statusData ? (
               <div className="p-6 space-y-6">
-                {/* Transaction Summary */}
                 <div className="bg-gray-50 rounded-lg p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold">Transaction Summary</h3>
@@ -215,7 +211,6 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
                     </div>
                   </div>
 
-                  {/* Verification Button */}
                   {statusData.stateMetadata.allowsVerification && (
                     <div className="mt-4 pt-4 border-t border-gray-200">
                       <Button
@@ -239,7 +234,6 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
                   )}
                 </div>
 
-                {/* State Metadata */}
                 <div className="bg-blue-50 rounded-lg p-4">
                   <h4 className="font-medium text-blue-900 mb-2">State Information</h4>
                   <p className="text-sm text-blue-800 mb-2">
@@ -254,18 +248,15 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
                   )}
                 </div>
 
-                {/* Timeline */}
                 <TransactionTimeline
                   stateTransitions={statusData.stateTransitions}
                   currentStatus={statusData.transaction.status}
                 />
 
-                {/* Verification Attempts */}
                 <VerificationAttempts
                   verificationAttempts={statusData.verificationAttempts}
                 />
 
-                {/* Callback Logs */}
                 <CallbackLogs callbackLogs={statusData.callbackLogs} />
               </div>
             ) : (
@@ -276,7 +267,7 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
           </div>
         </div>
       </div>
-      
+
       {toast && (
         <Toast
           message={toast.message}

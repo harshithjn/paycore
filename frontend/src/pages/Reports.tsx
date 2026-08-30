@@ -18,7 +18,7 @@ export const Reports = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!merchantId) return;
-      
+
       setLoading(true);
       try {
         const [txns, settles] = await Promise.all([
@@ -50,7 +50,7 @@ export const Reports = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      
+
       setToast({ message: 'Report downloaded', type: 'success' });
     } catch (err) {
       setToast({ message: 'Download failed', type: 'error' });
@@ -84,7 +84,6 @@ export const Reports = () => {
         <h1 className="text-2xl font-medium text-[#111] dark:text-[#EAEAEA]">Reports</h1>
       </div>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="card p-6">
           <div className="text-sm text-[#6B7280] mb-2">Total Transaction Volume</div>
@@ -108,10 +107,9 @@ export const Reports = () => {
         </div>
       </div>
 
-      {/* Download Reports */}
       <div className="card p-6">
         <h2 className="text-lg font-medium text-[#111] dark:text-[#EAEAEA] mb-4">Download Reports</h2>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
             onClick={() => downloadReport('CSV')}

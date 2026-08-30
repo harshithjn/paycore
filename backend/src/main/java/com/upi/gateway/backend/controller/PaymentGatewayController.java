@@ -15,15 +15,10 @@ import java.util.UUID;
 @RequestMapping("/api/gateway")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
 public class PaymentGatewayController {
-    
+
     private final PaymentGatewayService gatewayService;
-    
-    /**
-     * POST /api/gateway/generate-link/{transactionId}
-     * Generate payment link and QR code
-     */
+
     @PostMapping("/generate-link/{transactionId}")
     public ResponseEntity<?> generatePaymentLink(@PathVariable UUID transactionId) {
         try {
@@ -35,11 +30,7 @@ public class PaymentGatewayController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
     }
-    
-    /**
-     * POST /api/gateway/pay/card
-     * Process card payment
-     */
+
     @PostMapping("/pay/card")
     public ResponseEntity<?> processCardPayment(@Valid @RequestBody CardPaymentRequest request) {
         try {
@@ -50,11 +41,7 @@ public class PaymentGatewayController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-    
-    /**
-     * POST /api/gateway/pay/upi
-     * Process UPI payment
-     */
+
     @PostMapping("/pay/upi")
     public ResponseEntity<?> processUPIPayment(@Valid @RequestBody UPIPaymentRequest request) {
         try {

@@ -37,7 +37,6 @@ export const TransactionTimeline: React.FC<TransactionTimelineProps> = ({
     }) : 'N/A';
   };
 
-  // Create timeline items from state transitions
   const timelineItems = stateTransitions.map((transition, index) => {
     const isActive = transition.toStatus === currentStatus;
     const isFailed = transition.toStatus === 'FAILED';
@@ -45,10 +44,9 @@ export const TransactionTimeline: React.FC<TransactionTimelineProps> = ({
 
     return (
       <div key={transition.id} className="flex items-start space-x-4">
-        {/* Timeline dot */}
         <div className="flex flex-col items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 
-                  ${getStatusColor(isActive, isFailed)} bg-white z-10 
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2
+                  ${getStatusColor(isActive, isFailed)} bg-white z-10
                   transition-colors duration-300`}
                 >
                   {getStatusIcon(isActive, isFailed)}
@@ -58,7 +56,6 @@ export const TransactionTimeline: React.FC<TransactionTimelineProps> = ({
           )}
         </div>
 
-        {/* Timeline content */}
         <div className="flex-1 pb-8">
           <div className="flex items-center space-x-2 mb-1">
             <h4 className="text-sm font-semibold text-gray-900">
@@ -73,11 +70,11 @@ export const TransactionTimeline: React.FC<TransactionTimelineProps> = ({
               </>
             )}
           </div>
-          
+
           <p className="text-xs text-gray-600 mb-2">
             {formatTimestamp(transition.transitionedAt)}
           </p>
-          
+
           {transition.transitionReason && (
             <p className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
               {transition.transitionReason}

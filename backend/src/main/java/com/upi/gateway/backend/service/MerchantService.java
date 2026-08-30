@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,11 +30,8 @@ public class MerchantService {
                     throw new RuntimeException("Merchant already exists");
                 });
 
-        // Generate API key for the merchant
         String apiKey = "pk_" + UUID.randomUUID().toString().replace("-", "");
 
-        // NOTE: In a production environment, password should be hashed (e.g., using BCrypt).
-        // For this sandbox, we store it as plain text.
         Merchant merchant = Merchant.builder()
                 .name(request.getName())
                 .email(request.getEmail())
@@ -63,25 +59,25 @@ public class MerchantService {
 
         return new MerchantLoginResponse(merchant.getId(), "Login successful");
     }
-    
+
     public Optional<Merchant> findById(Long merchantId) {
         return merchantRepository.findById(merchantId);
     }
-    
+
     @Transactional
     public boolean updateWebhookUrl(Long merchantId, String webhookUrl) {
         log.info("Updating webhook URL for merchant {} to: {}", merchantId, webhookUrl);
-        
+
         Optional<Merchant> merchantOpt = merchantRepository.findById(merchantId);
         if (merchantOpt.isPresent()) {
             Merchant merchant = merchantOpt.get();
             merchant.setWebhookUrl(webhookUrl);
             merchantRepository.save(merchant);
-            
+
             log.info("Successfully updated webhook URL for merchant {}", merchantId);
             return true;
         }
-        
+
         log.warn("Merchant not found with ID: {}", merchantId);
         return false;
     }

@@ -7,14 +7,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
 
-/**
- * Configuration for async processing
- * Enables asynchronous execution for observers
- */
 @Configuration
 @EnableAsync
 public class AsyncConfig {
-    
+
     @Bean(name = "taskExecutor")
     public Executor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();

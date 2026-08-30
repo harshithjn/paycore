@@ -13,19 +13,19 @@ import java.util.UUID;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
-    
+
     List<Transaction> findByMerchantIdOrderByCreatedAtDesc(Long merchantId);
-    
+
     Page<Transaction> findByMerchantIdOrderByCreatedAtDesc(Long merchantId, Pageable pageable);
-    
+
     List<Transaction> findByMerchantIdAndStatusOrderByCreatedAtDesc(Long merchantId, Transaction.TransactionStatus status);
-    
+
     Page<Transaction> findByMerchantIdAndStatusOrderByCreatedAtDesc(Long merchantId, Transaction.TransactionStatus status, Pageable pageable);
-    
+
     @Query("SELECT t FROM Transaction t WHERE t.merchantId = :merchantId AND t.status IN :statuses ORDER BY t.createdAt DESC")
     List<Transaction> findByMerchantIdAndStatusInOrderByCreatedAtDesc(
-            @Param("merchantId") Long merchantId, 
+            @Param("merchantId") Long merchantId,
             @Param("statuses") List<Transaction.TransactionStatus> statuses);
-    
+
     long countByMerchantIdAndStatus(Long merchantId, Transaction.TransactionStatus status);
 }

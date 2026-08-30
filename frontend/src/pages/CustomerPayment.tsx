@@ -14,7 +14,7 @@ export const CustomerPayment = () => {
   const [processing, setProcessing] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [paymentComplete, setPaymentComplete] = useState(false);
-  
+
   const [cardData, setCardData] = useState({
     cardNumber: '',
     cvv: '',
@@ -33,11 +33,11 @@ export const CustomerPayment = () => {
 
   const fetchTransaction = async () => {
     if (!transactionId) return;
-    
+
     try {
       const data = await paymentApi.getTransactionStatus(transactionId);
       setTransaction(data);
-      
+
       if (data.status === 'SUCCESS') {
         setPaymentComplete(true);
       }
@@ -62,7 +62,7 @@ export const CustomerPayment = () => {
       });
 
       const data = await response.json();
-      
+
       if (data.status === 'SUCCESS') {
         setPaymentComplete(true);
         setToast({ message: 'Payment successful!', type: 'success' });
@@ -91,7 +91,7 @@ export const CustomerPayment = () => {
       });
 
       const data = await response.json();
-      
+
       if (data.status === 'SUCCESS') {
         setPaymentComplete(true);
         setToast({ message: 'Payment successful!', type: 'success' });
@@ -150,7 +150,7 @@ export const CustomerPayment = () => {
         {!paymentMethod && (
           <div className="card p-6">
             <h2 className="text-lg font-medium text-[#111] dark:text-[#EAEAEA] mb-4">Select Payment Method</h2>
-            
+
             <div className="space-y-3">
               <button
                 onClick={() => setPaymentMethod('upi')}
@@ -188,7 +188,6 @@ export const CustomerPayment = () => {
           </div>
         )}
 
-        {/* Card Payment Form */}
         {paymentMethod === 'card' && (
           <div className="card p-6">
             <button
@@ -197,9 +196,9 @@ export const CustomerPayment = () => {
             >
               ← Back
             </button>
-            
+
             <h2 className="text-lg font-medium text-[#111] dark:text-[#EAEAEA] mb-4">Card Details</h2>
-            
+
             <form onSubmit={handleCardPayment} className="space-y-4">
               <div>
                 <label className="block text-sm text-[#6B7280] mb-2">Card Number</label>
@@ -283,7 +282,6 @@ export const CustomerPayment = () => {
           </div>
         )}
 
-        {/* UPI Payment Form */}
         {paymentMethod === 'upi' && (
           <div className="card p-6">
             <button
@@ -292,9 +290,9 @@ export const CustomerPayment = () => {
             >
               ← Back
             </button>
-            
+
             <h2 className="text-lg font-medium text-[#111] dark:text-[#EAEAEA] mb-4">UPI Payment</h2>
-            
+
             <form onSubmit={handleUPIPayment} className="space-y-4">
               <div>
                 <label className="block text-sm text-[#6B7280] mb-2">UPI ID</label>
@@ -320,7 +318,6 @@ export const CustomerPayment = () => {
           </div>
         )}
 
-        {/* Net Banking */}
         {paymentMethod === 'netbanking' && (
           <div className="card p-6">
             <button
@@ -329,9 +326,9 @@ export const CustomerPayment = () => {
             >
               ← Back
             </button>
-            
+
             <h2 className="text-lg font-medium text-[#111] dark:text-[#EAEAEA] mb-4">Net Banking</h2>
-            
+
             <div className="space-y-3 mb-6">
               {['State Bank of India', 'HDFC Bank', 'ICICI Bank', 'Axis Bank', 'Kotak Mahindra'].map((bank) => (
                 <button

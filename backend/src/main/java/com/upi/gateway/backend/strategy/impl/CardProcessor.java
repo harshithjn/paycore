@@ -13,25 +13,23 @@ import java.util.concurrent.ThreadLocalRandom;
 @Component
 @Slf4j
 public class CardProcessor implements PaymentProcessor {
-    
+
     private static final String PAYMENT_METHOD = "CARD";
-    private static final int PROCESSING_DELAY_MS = 4000; // Card processing is slower
-    
+    private static final int PROCESSING_DELAY_MS = 4000;
+
     @Override
     public CompletableFuture<PaymentResult> process(Transaction transaction) {
         log.info("Processing Card payment for transaction: {}", transaction.getId());
-        
+
         return CompletableFuture.supplyAsync(() -> {
             try {
-                // Simulate card processing time
                 Thread.sleep(PROCESSING_DELAY_MS);
-                
-                // Simulate success/failure (85% success rate for cards)
+
                 boolean isSuccess = ThreadLocalRandom.current().nextDouble() < 0.85;
-                
+
                 if (isSuccess) {
                     String cardTransactionId = "CARD" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-                    log.info("Card payment successful for transaction: {} with Card ID: {}", 
+                    log.info("Card payment successful for transaction: {} with Card ID: {}",
                             transaction.getId(), cardTransactionId);
                     return PaymentResult.success(cardTransactionId, "Card payment processed successfully");
                 } else {
@@ -39,7 +37,7 @@ public class CardProcessor implements PaymentProcessor {
                     log.warn("Card payment failed for transaction: {} - {}", transaction.getId(), failureReason);
                     return PaymentResult.failure(failureReason);
                 }
-                
+
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 log.error("Card processing interrupted for transaction: {}", transaction.getId());
@@ -47,18 +45,18 @@ public class CardProcessor implements PaymentProcessor {
             }
         });
     }
-    
+
     @Override
     public String getPaymentMethod() {
         return PAYMENT_METHOD;
     }
-    
+
     @Override
     public boolean canProcess(Transaction transaction) {
         return PAYMENT_METHOD.equalsIgnoreCase(transaction.getPaymentMethod()) &&
-               transaction.getAmount().doubleValue() >= 1; // Minimum card amount
+               transaction.getAmount().doubleValue() >= 1;
     }
-    
+
     private String getRandomCardFailureReason() {
         String[] reasons = {
             "Card declined by bank",

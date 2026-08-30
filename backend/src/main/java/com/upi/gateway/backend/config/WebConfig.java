@@ -12,10 +12,16 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        String[] origins = allowedOrigins.split(",");
+        for (int i = 0; i < origins.length; i++) {
+            origins[i] = origins[i].trim();
+        }
+        boolean isWildcard = origins.length == 1 && origins[0].equals("*");
+
         registry.addMapping("/**")
-                .allowedOrigins(allowedOrigins.split(","))
+                .allowedOrigins(origins)
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(allowedOrigins.contains("*") ? false : true);
+                .allowCredentials(!isWildcard);
     }
 }

@@ -38,18 +38,15 @@ class TransactionStatusServiceTest {
 
     @Test
     void testValidStateTransition() {
-        // Arrange
         UUID transactionId = UUID.randomUUID();
         Transaction transaction = createTestTransaction(transactionId, Transaction.TransactionStatus.CREATED);
-        
+
         when(repository.findById(transactionId)).thenReturn(Optional.of(transaction));
         when(stateFactory.getHandler("CREATED")).thenReturn(new MockStateHandler("CREATED", true));
         when(repository.save(any(Transaction.class))).thenReturn(transaction);
 
-        // Act
         Transaction result = transactionStatusService.updateStatus(transactionId, "INITIATED");
 
-        // Assert
         assertEquals(Transaction.TransactionStatus.INITIATED, result.getStatus());
         verify(transactionService).notifyObservers(result);
         verify(repository).save(transaction);
@@ -57,14 +54,12 @@ class TransactionStatusServiceTest {
 
     @Test
     void testInvalidStateTransition() {
-        // Arrange
         UUID transactionId = UUID.randomUUID();
         Transaction transaction = createTestTransaction(transactionId, Transaction.TransactionStatus.SUCCESS);
-        
+
         when(repository.findById(transactionId)).thenReturn(Optional.of(transaction));
         when(stateFactory.getHandler("SUCCESS")).thenReturn(new MockStateHandler("SUCCESS", false));
 
-        // Act & Assert
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
             transactionStatusService.updateStatus(transactionId, "PROCESSING");
         });
@@ -76,11 +71,9 @@ class TransactionStatusServiceTest {
 
     @Test
     void testTransactionNotFound() {
-        // Arrange
         UUID transactionId = UUID.randomUUID();
         when(repository.findById(transactionId)).thenReturn(Optional.empty());
 
-        // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             transactionStatusService.updateStatus(transactionId, "INITIATED");
         });
@@ -90,18 +83,15 @@ class TransactionStatusServiceTest {
 
     @Test
     void testUpdateStatusWithFailureReason() {
-        // Arrange
         UUID transactionId = UUID.randomUUID();
         Transaction transaction = createTestTransaction(transactionId, Transaction.TransactionStatus.PROCESSING);
-        
+
         when(repository.findById(transactionId)).thenReturn(Optional.of(transaction));
         when(stateFactory.getHandler("PROCESSING")).thenReturn(new MockStateHandler("PROCESSING", true));
         when(repository.save(any(Transaction.class))).thenReturn(transaction);
 
-        // Act
         Transaction result = transactionStatusService.updateStatus(transactionId, "FAILED", "Payment timeout");
 
-        // Assert
         assertEquals(Transaction.TransactionStatus.FAILED, result.getStatus());
         assertEquals("Payment timeout", result.getFailureReason());
         verify(transactionService).notifyObservers(result);
@@ -117,7 +107,6 @@ class TransactionStatusServiceTest {
                 .build();
     }
 
-    // Mock state handler for testing
     private static class MockStateHandler implements com.upi.gateway.backend.state.TransactionStateHandler {
         private final String state;
         private final boolean canTransition;

@@ -32,7 +32,6 @@ export const Signup: React.FC = () => {
 
       const { merchantId } = res.data;
 
-      // Fetch full merchant details
       const detailsRes = await apiClient.get(`/api/merchant/${merchantId}`);
       const merchant = detailsRes.data;
 
@@ -76,7 +75,6 @@ export const Signup: React.FC = () => {
           )}
 
           <form onSubmit={handleSignup} className="space-y-4">
-            {/* Full Name */}
             <div>
               <label className="block text-sm font-medium text-[#374151] dark:text-[#D1D5DB] mb-1.5">
                 Full Name
@@ -96,7 +94,6 @@ export const Signup: React.FC = () => {
               </div>
             </div>
 
-            {/* Business Name */}
             <div>
               <label className="block text-sm font-medium text-[#374151] dark:text-[#D1D5DB] mb-1.5">
                 Business Name
@@ -116,7 +113,6 @@ export const Signup: React.FC = () => {
               </div>
             </div>
 
-            {/* Phone Number */}
             <div>
               <label className="block text-sm font-medium text-[#374151] dark:text-[#D1D5DB] mb-1.5">
                 Phone Number
@@ -136,7 +132,6 @@ export const Signup: React.FC = () => {
               </div>
             </div>
 
-            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-[#374151] dark:text-[#D1D5DB] mb-1.5">
                 Email Address
@@ -156,7 +151,6 @@ export const Signup: React.FC = () => {
               </div>
             </div>
 
-            {/* Password */}
             <div>
               <label className="block text-sm font-medium text-[#374151] dark:text-[#D1D5DB] mb-1.5">
                 Password

@@ -1,17 +1,43 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Zap, Mail, Lock, ArrowRight } from 'lucide-react';
+import { Zap, Mail, Lock, ArrowRight, UserRound } from 'lucide-react';
 import { useMerchant } from '../context/MerchantContext';
 import { Button } from '../components/ui/Button';
 import apiClient from '../api/client';
+
+const GUEST_EMAIL = 'guest@paycore.demo';
+const GUEST_PASSWORD = 'guest-demo-1234';
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isGuestLoading, setIsGuestLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { login } = useMerchant();
+
+  const loginWithCredentials = async (loginEmail: string, loginPassword: string) => {
+    const loginRes = await apiClient.post('/api/merchant/login', {
+      email: loginEmail,
+      password: loginPassword,
+    });
+    const { merchantId } = loginRes.data;
+
+    const detailsRes = await apiClient.get(`/api/merchant/${merchantId}`);
+    const merchant = detailsRes.data;
+
+    login({
+      id: merchant.id,
+      name: merchant.name,
+      logo: merchant.name?.charAt(0)?.toUpperCase() || '',
+      email: merchant.email,
+      phone: merchant.phone || '',
+      businessName: merchant.businessName || '',
+    });
+
+    navigate(`/merchant/${merchant.id}/dashboard`);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,27 +45,34 @@ export const Login: React.FC = () => {
     setError('');
 
     try {
-      const loginRes = await apiClient.post('/api/merchant/login', { email, password });
-      const { merchantId } = loginRes.data;
-
-      // Fetch full merchant details
-      const detailsRes = await apiClient.get(`/api/merchant/${merchantId}`);
-      const merchant = detailsRes.data;
-
-      login({
-        id: merchant.id,
-        name: merchant.name,
-        logo: merchant.name?.charAt(0)?.toUpperCase() || '',
-        email: merchant.email,
-        phone: merchant.phone || '',
-        businessName: merchant.businessName || '',
-      });
-
-      navigate(`/merchant/${merchant.id}/dashboard`);
+      await loginWithCredentials(email, password);
     } catch (err: any) {
       setError(err.message || 'Invalid email or password');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    setIsGuestLoading(true);
+    setError('');
+
+    try {
+      await loginWithCredentials(GUEST_EMAIL, GUEST_PASSWORD);
+    } catch {
+      try {
+        await apiClient.post('/api/merchant/register', {
+          name: 'Guest User',
+          email: GUEST_EMAIL,
+          password: GUEST_PASSWORD,
+          businessName: 'PayCore Demo',
+        });
+        await loginWithCredentials(GUEST_EMAIL, GUEST_PASSWORD);
+      } catch (err: any) {
+        setError(err.message || 'Unable to start guest session');
+      }
+    } finally {
+      setIsGuestLoading(false);
     }
   };
 
@@ -108,7 +141,7 @@ export const Login: React.FC = () => {
 
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || isGuestLoading}
               className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-[#111] hover:bg-[#333] dark:bg-[#EAEAEA] dark:text-[#111] dark:hover:bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#111] transition-colors mt-2"
             >
               {isLoading ? 'Signing in...' : (
@@ -119,6 +152,33 @@ export const Login: React.FC = () => {
               )}
             </Button>
           </form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#E5E7EB] dark:border-[#2A2A2A]" />
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="px-2 bg-white dark:bg-[#111] text-[#9CA3AF]">or</span>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleGuestLogin}
+            disabled={isLoading || isGuestLoading}
+            className="w-full flex justify-center py-2.5 px-4 rounded-lg text-sm font-medium text-[#374151] dark:text-[#D1D5DB] bg-white dark:bg-[#0B0B0C] border-[#E5E7EB] dark:border-[#2A2A2A] hover:bg-[#F9FAFB] dark:hover:bg-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#111] transition-colors"
+          >
+            {isGuestLoading ? 'Starting guest session...' : (
+              <span className="flex items-center">
+                <UserRound className="mr-2 h-4 w-4" />
+                Continue as Guest
+              </span>
+            )}
+          </Button>
+          <p className="mt-2 text-center text-xs text-[#9CA3AF]">
+            No account needed — explore the dashboard instantly.
+          </p>
 
           <p className="mt-8 text-center text-sm text-[#6B7280]">
             Don't have an account?{' '}

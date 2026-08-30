@@ -40,7 +40,6 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#0B0B0C] font-sans">
-      {/* Navigation */}
       <nav className="border-b border-[#E5E7EB] dark:border-[#2A2A2A] bg-white/80 dark:bg-[#111]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -66,7 +65,6 @@ export const LandingPage: React.FC = () => {
         </div>
       </nav>
 
-      {/* Hero Section */}
       <section className="max-w-6xl mx-auto px-6 pt-24 pb-20 text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F3F4F6] dark:bg-[#1A1A1A] border border-[#E5E7EB] dark:border-[#2A2A2A] text-xs font-medium text-[#6B7280] mb-6">
           <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
@@ -97,7 +95,6 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Features Grid */}
       <section className="max-w-6xl mx-auto px-6 pb-24">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, i) => {
@@ -122,7 +119,6 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-[#E5E7EB] dark:border-[#2A2A2A] bg-white dark:bg-[#111]">
         <div className="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between">
           <div className="flex items-center gap-2">

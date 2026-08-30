@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { Dashboard } from './pages/Dashboard';
@@ -26,22 +25,17 @@ function App() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Analytics />
         <Routes>
-          {/* Public Auth Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          
-          {/* Redirect root to landing page */}
+
           <Route path="/" element={<LandingPage />} />
-          
-          {/* Public Payment Link Route */}
+
           <Route path="/pay/:transactionId" element={<CustomerPayment />} />
           <Route path="/pay/link/:linkCode" element={<PaymentLinkCheckout />} />
-          
-          {/* Standalone Pages */}
+
           <Route path="/merchant/:merchantId/payment-initiation" element={<PaymentInitiation />} />
           <Route path="/merchant/:merchantId/verification" element={<TransactionVerification />} />
-          
-          {/* Merchant routes */}
+
           <Route path="/merchant/:merchantId" element={<DashboardLayout />}>
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="transactions" element={<Transactions />} />
@@ -52,12 +46,10 @@ function App() {
             <Route path="api-keys" element={<ApiKeys />} />
             <Route path="developer" element={<DeveloperPortal />} />
             <Route path="settings" element={<Settings />} />
-            
-            {/* Default redirect to dashboard */}
+
             <Route index element={<Navigate to="dashboard" replace />} />
           </Route>
-          
-          {/* Catch all route */}
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

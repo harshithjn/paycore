@@ -13,25 +13,23 @@ import java.util.concurrent.ThreadLocalRandom;
 @Component
 @Slf4j
 public class NetBankingProcessor implements PaymentProcessor {
-    
+
     private static final String PAYMENT_METHOD = "NETBANKING";
-    private static final int PROCESSING_DELAY_MS = 6000; // NetBanking is slowest
-    
+    private static final int PROCESSING_DELAY_MS = 6000;
+
     @Override
     public CompletableFuture<PaymentResult> process(Transaction transaction) {
         log.info("Processing NetBanking payment for transaction: {}", transaction.getId());
-        
+
         return CompletableFuture.supplyAsync(() -> {
             try {
-                // Simulate NetBanking processing time
                 Thread.sleep(PROCESSING_DELAY_MS);
-                
-                // Simulate success/failure (80% success rate for NetBanking)
+
                 boolean isSuccess = ThreadLocalRandom.current().nextDouble() < 0.8;
-                
+
                 if (isSuccess) {
                     String netBankingTransactionId = "NB" + UUID.randomUUID().toString().substring(0, 10).toUpperCase();
-                    log.info("NetBanking payment successful for transaction: {} with NB ID: {}", 
+                    log.info("NetBanking payment successful for transaction: {} with NB ID: {}",
                             transaction.getId(), netBankingTransactionId);
                     return PaymentResult.success(netBankingTransactionId, "NetBanking payment completed successfully");
                 } else {
@@ -39,7 +37,7 @@ public class NetBankingProcessor implements PaymentProcessor {
                     log.warn("NetBanking payment failed for transaction: {} - {}", transaction.getId(), failureReason);
                     return PaymentResult.failure(failureReason);
                 }
-                
+
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 log.error("NetBanking processing interrupted for transaction: {}", transaction.getId());
@@ -47,18 +45,18 @@ public class NetBankingProcessor implements PaymentProcessor {
             }
         });
     }
-    
+
     @Override
     public String getPaymentMethod() {
         return PAYMENT_METHOD;
     }
-    
+
     @Override
     public boolean canProcess(Transaction transaction) {
         return PAYMENT_METHOD.equalsIgnoreCase(transaction.getPaymentMethod()) &&
-               transaction.getAmount().doubleValue() >= 1; // Minimum NetBanking amount
+               transaction.getAmount().doubleValue() >= 1;
     }
-    
+
     private String getRandomNetBankingFailureReason() {
         String[] reasons = {
             "Bank server maintenance",

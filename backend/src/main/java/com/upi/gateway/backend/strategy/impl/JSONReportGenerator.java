@@ -12,34 +12,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * LSP Implementation: JSON Report Generator
- */
 @Component
 @Slf4j
 public class JSONReportGenerator implements ReportGenerator {
-    
+
     private final ObjectMapper objectMapper;
-    
+
     public JSONReportGenerator() {
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
     }
-    
+
     @Override
     public boolean supports(String format) {
         return "JSON".equalsIgnoreCase(format);
     }
-    
+
     @Override
     public String generateReport(List<Settlement> settlements, Long merchantId) {
         log.info("Generating JSON report for merchant: {}", merchantId);
-        
+
         Map<String, Object> report = new HashMap<>();
         report.put("merchantId", merchantId);
         report.put("totalSettlements", settlements.size());
         report.put("settlements", settlements);
-        
+
         try {
             return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(report);
         } catch (JsonProcessingException e) {
@@ -47,7 +44,7 @@ public class JSONReportGenerator implements ReportGenerator {
             return "{\"error\": \"Failed to generate report\"}";
         }
     }
-    
+
     @Override
     public String getContentType() {
         return "application/json";

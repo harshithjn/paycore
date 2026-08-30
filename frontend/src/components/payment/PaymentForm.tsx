@@ -24,14 +24,12 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
     customerEmail: '',
     customerPhone: ''
   });
-  
+
   const [isLoading, setIsLoading] = useState(false);
-
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.amount <= 0) {
       onError('Amount must be greater than 0');
       return;
@@ -56,12 +54,10 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
     }));
   };
 
-
-
   return (
     <Card className="p-6">
       <h2 className="text-xl font-semibold mb-6">Initiate Payment</h2>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
@@ -125,8 +121,6 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
             placeholder="Enter customer phone"
           />
         </div>
-
-
 
         <Button
           type="submit"

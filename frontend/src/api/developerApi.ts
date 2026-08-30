@@ -2,7 +2,6 @@ import apiClient from './client';
 import type { PaymentLink, ApiLog } from '../types';
 
 export const developerApi = {
-  // Merchant session-based endpoints
   getPaymentLinks: async (merchantId: number): Promise<PaymentLink[]> => {
     const response = await apiClient.get(`/api/merchant/${merchantId}/payment-links`);
     return response.data;
@@ -28,7 +27,6 @@ export const developerApi = {
     return response.data;
   },
 
-  // Public/External API simulation endpoints
   getLinkDetails: async (linkCode: string): Promise<any> => {
     const response = await apiClient.get(`/api/v1/payment-links/${linkCode}`);
     return response.data;
@@ -39,7 +37,6 @@ export const developerApi = {
     return response.data;
   },
 
-  // Developer API (using X-Api-Key)
   createLinkViaApi: async (apiKey: string, data: any): Promise<any> => {
     const response = await apiClient.post('/api/v1/payment-links', data, {
       headers: { 'X-Api-Key': apiKey }

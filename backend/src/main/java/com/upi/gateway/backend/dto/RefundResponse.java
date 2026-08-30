@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RefundResponse {
-    
+
     private UUID refundId;
     private UUID transactionId;
     private Double amount;

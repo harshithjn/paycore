@@ -15,10 +15,10 @@ export const Dashboard = () => {
 
   const fetchData = async () => {
     if (!merchantId) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const txns = await transactionApi.getAll(Number(merchantId));
       setTransactions(txns);
@@ -76,7 +76,6 @@ export const Dashboard = () => {
     <div>
       <h1 className="text-2xl font-medium text-[#111] dark:text-[#EAEAEA] mb-6">Dashboard</h1>
 
-      {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="card p-6">
           <div className="flex items-center justify-between mb-2">
@@ -119,10 +118,9 @@ export const Dashboard = () => {
         </div>
       </div>
 
-      {/* Recent Transactions */}
       <div className="card p-6">
         <h2 className="text-lg font-medium text-[#111] dark:text-[#EAEAEA] mb-4">Recent Transactions</h2>
-        
+
         {transactions.length === 0 ? (
           <div className="text-center py-8 text-[#6B7280]">
             No transactions yet

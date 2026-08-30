@@ -11,7 +11,7 @@ export const ApiKeys = () => {
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
-  const publishableKey = `pk_live_${merchant?.id}test${merchant?.id}`; // Simulated publishable key
+  const publishableKey = `pk_live_${merchant?.id}test${merchant?.id}`;
   const secretKey = merchant?.apiKey || 'Not generated yet';
 
   const copyToClipboard = (text: string) => {
@@ -21,7 +21,7 @@ export const ApiKeys = () => {
 
   const handleRegenerate = async () => {
     if (!merchant || !window.confirm('Are you sure? Your old key will stop working immediately.')) return;
-    
+
     setIsRegenerating(true);
     try {
       const response = await developerApi.regenerateApiKey(merchant.id);
@@ -43,7 +43,6 @@ export const ApiKeys = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          {/* Publishable Key */}
           <div className="card p-6">
             <div className="flex items-start justify-between mb-4">
               <div>
@@ -54,7 +53,7 @@ export const ApiKeys = () => {
                 Active
               </span>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <code className="flex-1 px-4 py-3 bg-[#F9FAFB] dark:bg-[#0B0B0C] border border-[#E5E7EB] dark:border-[#2A2A2A] rounded-xl text-xs text-[#111] dark:text-[#EAEAEA] font-mono overflow-x-auto">
                 {publishableKey}
@@ -68,16 +67,15 @@ export const ApiKeys = () => {
             </div>
           </div>
 
-          {/* Secret Key */}
           <div className="card p-6">
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h3 className="text-sm font-semibold text-[#111] dark:text-[#EAEAEA] mb-1 uppercase tracking-wider">Secret Key</h3>
                 <p className="text-xs text-[#6B7280]">Keep this secure, never expose in client code</p>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
                 onClick={handleRegenerate}
                 disabled={isRegenerating}
@@ -86,7 +84,7 @@ export const ApiKeys = () => {
                 Regenerate
               </Button>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <code className="flex-1 px-4 py-3 bg-[#F9FAFB] dark:bg-[#0B0B0C] border border-[#E5E7EB] dark:border-[#2A2A2A] rounded-xl text-xs text-[#111] dark:text-[#EAEAEA] font-mono overflow-x-auto">
                 {showSecret ? secretKey : '••••••••••••••••••••••••••••••••••••••••'}
@@ -106,7 +104,6 @@ export const ApiKeys = () => {
             </div>
           </div>
 
-          {/* API Documentation Section */}
           <div className="mt-12">
              <div className="flex items-center gap-2 mb-6">
                 <Book className="text-[#4F46E5]" size={20} />
@@ -152,8 +149,8 @@ export const ApiKeys = () => {
              <p className="text-sm text-[#6B7280] mb-6 leading-relaxed">
                Use the Developer Sandbox to test your API integration without writing any code. Create links, simulate customer flows, and monitor logs.
              </p>
-             <Button 
-               variant="outline" 
+             <Button
+               variant="outline"
                className="w-full border-[#E5E7EB] dark:border-[#2A2A2A] text-[#111] dark:text-[#EAEAEA] hover:bg-[#F9FAFB] dark:hover:bg-[#1A1A1A]"
                onClick={() => window.location.href = window.location.href.split('api-keys')[0] + 'developer'}
              >

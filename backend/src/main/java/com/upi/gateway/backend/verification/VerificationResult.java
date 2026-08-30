@@ -8,23 +8,20 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-/**
- * Result of payment verification
- */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class VerificationResult {
-    
+
     private boolean success;
-    private String status; // SUCCESS, FAILED, PROCESSING
+    private String status;
     private String message;
     private String providerTransactionId;
     private String failureReason;
     private LocalDateTime verifiedAt;
     private Map<String, Object> additionalData;
-    
+
     public static VerificationResult success(String providerTransactionId, String message) {
         return VerificationResult.builder()
                 .success(true)
@@ -34,7 +31,7 @@ public class VerificationResult {
                 .verifiedAt(LocalDateTime.now())
                 .build();
     }
-    
+
     public static VerificationResult failure(String reason) {
         return VerificationResult.builder()
                 .success(false)
@@ -44,7 +41,7 @@ public class VerificationResult {
                 .verifiedAt(LocalDateTime.now())
                 .build();
     }
-    
+
     public static VerificationResult processing(String message) {
         return VerificationResult.builder()
                 .success(true)

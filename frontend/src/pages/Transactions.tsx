@@ -18,10 +18,10 @@ export const Transactions = () => {
 
   const fetchTransactions = async () => {
     if (!merchantId) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const data = await transactionApi.getAll(Number(merchantId));
       setTransactions(data);
@@ -82,8 +82,8 @@ export const Transactions = () => {
       <div className="card">
         {transactions.length === 0 ? (
           <div className="p-6">
-            <EmptyState 
-              title="No transactions yet" 
+            <EmptyState
+              title="No transactions yet"
               description="Transactions will appear here once payments are initiated"
             />
           </div>
@@ -138,10 +138,9 @@ export const Transactions = () => {
         )}
       </div>
 
-      {/* Transaction Details Drawer */}
       {selectedTxn && (
         <div className="fixed inset-0 bg-black bg-opacity-30 z-50 flex items-center justify-end">
-          <div 
+          <div
             className="w-full max-w-2xl h-full bg-white dark:bg-[#111] shadow-2xl overflow-y-auto animate-slide-in"
             style={{ animation: 'slideIn 200ms ease-out' }}
           >
@@ -157,7 +156,6 @@ export const Transactions = () => {
                 <LoadingSkeleton rows={6} />
               ) : (
                 <>
-                  {/* Transaction Info */}
                   <div>
                     <h3 className="text-sm font-medium text-[#6B7280] mb-3">Transaction Information</h3>
                     <div className="space-y-2">
@@ -180,7 +178,6 @@ export const Transactions = () => {
                     </div>
                   </div>
 
-                  {/* State Transitions */}
                   {selectedTxn.stateTransitions.length > 0 && (
                     <div>
                       <h3 className="text-sm font-medium text-[#6B7280] mb-3">Timeline</h3>
@@ -202,7 +199,6 @@ export const Transactions = () => {
                     </div>
                   )}
 
-                  {/* Callback Logs */}
                   {selectedTxn.callbackLogs.length > 0 && (
                     <div>
                       <h3 className="text-sm font-medium text-[#6B7280] mb-3">Callback Status</h3>

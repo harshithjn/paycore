@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SettlementResponse {
-    
+
     private UUID settlementId;
     private Long merchantId;
     private Double grossAmount;

@@ -12,25 +12,21 @@ import reactor.netty.http.client.HttpClient;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
-/**
- * WebClient configuration for webhook calls
- * Provides optimized HTTP client for reactive webhook notifications
- */
 @Configuration
 public class WebClientConfig {
-    
+
     @Bean
     public WebClient webClient() {
         HttpClient httpClient = HttpClient.create()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
                 .responseTimeout(Duration.ofSeconds(10))
-                .doOnConnected(conn -> 
+                .doOnConnected(conn ->
                     conn.addHandlerLast(new ReadTimeoutHandler(10, TimeUnit.SECONDS))
                         .addHandlerLast(new WriteTimeoutHandler(10, TimeUnit.SECONDS)));
-        
+
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(1024 * 1024)) // 1MB
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(1024 * 1024))
                 .build();
     }
 }

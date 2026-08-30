@@ -30,30 +30,27 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    // Initial fetch to establish baseline
     const initializeBaseline = async () => {
       if (!merchantId) return;
       try {
         const txns = await paymentApi.getMerchantTransactions(merchantId);
         if (txns && txns.length > 0) {
-           // We don't notify on past transactions on first load
            setLastCheckedTime(new Date());
         }
       } catch (e) {
         console.error("Failed to initialize notification baseline", e);
       }
     };
-    
+
     initializeBaseline();
 
-    // Poll every 10 seconds for new SUCCESS transactions
     const interval = setInterval(async () => {
       if (!merchantId) return;
       try {
         const txns = await paymentApi.getMerchantTransactions(merchantId);
-        
-        const newSuccessTxns = txns.filter(t => 
-          t.status === 'SUCCESS' && 
+
+        const newSuccessTxns = txns.filter(t =>
+          t.status === 'SUCCESS' &&
           new Date(t.createdAt || t.updatedAt) > lastCheckedTime
         );
 
@@ -67,11 +64,10 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
           }));
 
           setNotifications(prev => {
-            // Keep at most 2 notifications as requested
             const combined = [...newNotifs, ...prev];
             return combined.slice(0, 2);
           });
-          
+
           setUnreadCount(prev => Math.min(prev + newNotifs.length, 2));
           setLastCheckedTime(new Date());
         }

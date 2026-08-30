@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { 
-  Link as LinkIcon, 
-  History, 
-  Plus, 
-  Copy, 
-  ExternalLink, 
-  RefreshCw, 
-  Shield, 
+import {
+  Link as LinkIcon,
+  History,
+  Plus,
+  Copy,
+  ExternalLink,
+  RefreshCw,
+  Shield,
   Power,
   PowerOff,
   Terminal,
@@ -25,8 +25,7 @@ export const DeveloperPortal = () => {
   const [logs, setLogs] = useState<ApiLog[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
-  
-  // Create Link Modal State
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newLink, setNewLink] = useState({
     title: '',
@@ -35,7 +34,6 @@ export const DeveloperPortal = () => {
     isReusable: true
   });
 
-  // Quick Test State
   const [testPayload, setTestPayload] = useState('{\n  "title": "API Test Link",\n  "amount": 500.00,\n  "isReusable": true\n}');
   const [testResult, setTestResult] = useState<any>(null);
   const [isTesting, setIsTesting] = useState(false);
@@ -76,7 +74,7 @@ export const DeveloperPortal = () => {
   const handleCreateLink = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!merchant) return;
-    
+
     try {
       await developerApi.createPaymentLink(merchant.id, {
         title: newLink.title,
@@ -109,7 +107,7 @@ export const DeveloperPortal = () => {
       setToast({ message: 'API key not found', type: 'error' });
       return;
     }
-    
+
     setIsTesting(true);
     setTestResult(null);
     try {
@@ -139,23 +137,23 @@ export const DeveloperPortal = () => {
           <h1 className="text-2xl font-medium text-[#111] dark:text-[#EAEAEA]">Developer Portal</h1>
           <p className="text-[#6B7280] text-sm mt-1">Manage reusable payment links and monitor API activity</p>
         </div>
-        
+
         <div className="flex bg-white dark:bg-[#111] border border-[#E5E7EB] dark:border-[#2A2A2A] rounded-lg p-1">
-          <button 
+          <button
             onClick={() => setActiveTab('links')}
             className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm transition-all ${activeTab === 'links' ? 'bg-[#F3F4F6] dark:bg-[#1A1A1A] text-[#111] dark:text-[#EAEAEA]' : 'text-[#6B7280]'}`}
           >
             <LinkIcon size={16} />
             Payment Links
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('logs')}
             className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm transition-all ${activeTab === 'logs' ? 'bg-[#F3F4F6] dark:bg-[#1A1A1A] text-[#111] dark:text-[#EAEAEA]' : 'text-[#6B7280]'}`}
           >
             <History size={16} />
             API Logs
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('test')}
             className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm transition-all ${activeTab === 'test' ? 'bg-[#F3F4F6] dark:bg-[#1A1A1A] text-[#111] dark:text-[#EAEAEA]' : 'text-[#6B7280]'}`}
           >
@@ -165,7 +163,6 @@ export const DeveloperPortal = () => {
         </div>
       </div>
 
-      {/* Payment Links Tab */}
       {activeTab === 'links' && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
@@ -185,8 +182,8 @@ export const DeveloperPortal = () => {
                     <p className="text-xs text-[#6B7280]">{link.linkCode}</p>
                   </div>
                   <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full ${
-                    link.status === 'ACTIVE' 
-                      ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400' 
+                    link.status === 'ACTIVE'
+                      ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
                       : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
                   }`}>
                     {link.status}
@@ -211,24 +208,24 @@ export const DeveloperPortal = () => {
 
                 <div className="mt-auto space-y-2">
                   <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       className="flex-1 text-xs py-1.5"
                       onClick={() => copyToClipboard(getLinkUrl(link.linkCode))}
                     >
                       <Copy size={14} className="mr-1.5" />
                       Copy URL
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       className="text-xs py-1.5"
                       onClick={() => window.open(getLinkUrl(link.linkCode), '_blank')}
                     >
                       <ExternalLink size={14} />
                     </Button>
                   </div>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     className={`w-full text-xs py-1.5 ${link.status === 'ACTIVE' ? 'text-red-600 hover:text-red-700 hover:bg-red-50' : 'text-green-600 hover:text-green-700 hover:bg-green-50'}`}
                     onClick={() => toggleLinkStatus(link.linkCode)}
                   >
@@ -241,7 +238,7 @@ export const DeveloperPortal = () => {
                 </div>
               </div>
             ))}
-            
+
             {links.length === 0 && !isLoading && (
               <div className="col-span-full py-12 text-center card">
                 <LinkIcon size={40} className="mx-auto text-[#D1D5DB] mb-3" />
@@ -255,7 +252,6 @@ export const DeveloperPortal = () => {
         </div>
       )}
 
-      {/* API Logs Tab */}
       {activeTab === 'logs' && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
@@ -321,7 +317,6 @@ export const DeveloperPortal = () => {
         </div>
       )}
 
-      {/* Sandbox Tab */}
       {activeTab === 'test' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="space-y-6">
@@ -341,7 +336,7 @@ export const DeveloperPortal = () => {
                 </span>
                 <span className="text-[10px] text-[#6B7280] font-mono">Content-Type: application/json</span>
               </div>
-              
+
               <div className="mb-4">
                 <label className="text-[10px] text-[#6B7280] font-medium uppercase mb-2 block">X-Api-Key</label>
                 <div className="px-3 py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-md text-xs text-[#EAEAEA] font-mono">
@@ -351,15 +346,15 @@ export const DeveloperPortal = () => {
 
               <div className="mb-6">
                 <label className="text-[10px] text-[#6B7280] font-medium uppercase mb-2 block">Request Body (JSON)</label>
-                <textarea 
+                <textarea
                   value={testPayload}
                   onChange={(e) => setTestPayload(e.target.value)}
                   className="w-full h-40 bg-[#1A1A1A] border border-[#2A2A2A] rounded-md p-4 text-xs text-[#34D399] font-mono focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
-              <Button 
-                onClick={runApiTest} 
+              <Button
+                onClick={runApiTest}
                 disabled={isTesting}
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white border-0 py-2"
               >
@@ -392,7 +387,7 @@ export const DeveloperPortal = () => {
                     <p className="text-sm">Response will appear here</p>
                   </div>
                 )}
-                
+
                 {testResult && !testResult.error && (
                   <div className="p-4 border-t border-[#2A2A2A] bg-[#1a1a1b]">
                     <p className="text-xs text-[#EAEAEA] mb-3">Your payment link is live!</p>
@@ -412,7 +407,6 @@ export const DeveloperPortal = () => {
         </div>
       )}
 
-      {/* Create Link Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-[#111] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
@@ -422,12 +416,12 @@ export const DeveloperPortal = () => {
                 <Plus size={24} className="rotate-45" />
               </button>
             </div>
-            
+
             <form onSubmit={handleCreateLink} className="p-6 space-y-4">
               <div>
                 <label className="block text-xs font-medium text-[#6B7280] uppercase mb-1">Link Title</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   required
                   placeholder="e.g. Donation for Event, Monthly Fee"
                   value={newLink.title}
@@ -438,7 +432,7 @@ export const DeveloperPortal = () => {
 
               <div>
                 <label className="block text-xs font-medium text-[#6B7280] uppercase mb-1">Description (Optional)</label>
-                <textarea 
+                <textarea
                   placeholder="Describe what people are paying for..."
                   value={newLink.description}
                   onChange={(e) => setNewLink({ ...newLink, description: e.target.value })}
@@ -450,8 +444,8 @@ export const DeveloperPortal = () => {
                 <label className="block text-xs font-medium text-[#6B7280] uppercase mb-1">Amount (₹)</label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B7280]">₹</span>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     required
                     step="0.01"
                     placeholder="0.00"
@@ -471,8 +465,8 @@ export const DeveloperPortal = () => {
                    <p className="text-[10px] text-indigo-700/70 dark:text-indigo-400/70">Collect multiple payments from different people using this single link.</p>
                 </div>
                 <div className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={newLink.isReusable}
                     onChange={(e) => setNewLink({ ...newLink, isReusable: e.target.checked })}
                     className="sr-only peer"

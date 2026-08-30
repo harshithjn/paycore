@@ -13,7 +13,7 @@ import { Button } from '../components/ui/Button';
 export const PaymentInitiation = () => {
   const { merchantId } = useParams<{ merchantId: string }>();
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
-  
+
   const [currentTransaction, setCurrentTransaction] = useState<Transaction | null>(null);
   const [generatedLink, setGeneratedLink] = useState('');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -68,10 +68,10 @@ export const PaymentInitiation = () => {
           clearInterval(interval);
           setPollingInterval(null);
           loadTransactions();
-          
+
           setToast({
-            message: transaction.status === 'SUCCESS' 
-              ? 'Payment completed successfully' 
+            message: transaction.status === 'SUCCESS'
+              ? 'Payment completed successfully'
               : transaction.failureReason || 'Payment failed',
             type: transaction.status === 'SUCCESS' ? 'success' : 'error'
           });
@@ -91,7 +91,7 @@ export const PaymentInitiation = () => {
   const handleTransactionClick = (transaction: Transaction) => {
     setCurrentTransaction(transaction);
     setGeneratedLink(`${window.location.origin}/pay/${transaction.id}`);
-    
+
     if (transaction.status === 'PROCESSING' || transaction.status === 'INITIATED') {
       startPolling(transaction.id);
     }
@@ -131,23 +131,23 @@ export const PaymentInitiation = () => {
                     </div>
                   )}
                 </div>
-                
+
                 {(currentTransaction.status === 'INITIATED' || currentTransaction.status === 'PROCESSING') && generatedLink && (
                   <div className="mb-6 p-4 border border-indigo-100 dark:border-indigo-900/50 bg-indigo-50/50 dark:bg-indigo-900/20 rounded-xl">
                     <h3 className="text-sm font-medium text-indigo-900 dark:text-indigo-200 mb-3">Scan or click to pay limit demo payment</h3>
                     <div className="flex flex-col sm:flex-row items-center gap-4">
                       <div className="bg-white p-2 rounded-lg shadow-sm shrink-0">
-                        <img 
-                          src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(generatedLink)}`} 
-                          alt="Payment QR Code" 
+                        <img
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(generatedLink)}`}
+                          alt="Payment QR Code"
                           className="w-24 h-24"
                         />
                       </div>
                       <div className="w-full">
-                        <input 
-                          type="text" 
-                          readOnly 
-                          value={generatedLink} 
+                        <input
+                          type="text"
+                          readOnly
+                          value={generatedLink}
                           className="w-full text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 text-gray-600 dark:text-gray-300 mb-2 truncate"
                         />
                         <div className="flex gap-2">
@@ -162,7 +162,7 @@ export const PaymentInitiation = () => {
                     </div>
                   </div>
                 )}
-                
+
                 <TransactionStatus transaction={currentTransaction} />
               </div>
             )}
@@ -181,7 +181,7 @@ export const PaymentInitiation = () => {
                 Refresh
               </Button>
             </div>
-            
+
             <TransactionList
               transactions={transactions}
               onTransactionClick={handleTransactionClick}

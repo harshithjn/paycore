@@ -16,14 +16,12 @@ export const Navbar: React.FC = () => {
   return (
     <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6">
       <div className="flex h-full items-center justify-between">
-        {/* Left section */}
         <div className="flex items-center space-x-4">
           <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
             Merchant Dashboard
           </h1>
         </div>
 
-        {/* Center - Search */}
         <div className="flex-1 max-w-md mx-8">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -35,9 +33,7 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Right section */}
         <div className="flex items-center space-x-4">
-          {/* Theme toggle */}
           <Button
             variant="ghost"
             size="sm"
@@ -47,13 +43,11 @@ export const Navbar: React.FC = () => {
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
 
-          {/* Notifications */}
           <Button variant="ghost" size="sm" className="p-2 relative">
             <Bell className="h-4 w-4" />
             <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
           </Button>
 
-          {/* Profile dropdown */}
           <div className="relative">
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}

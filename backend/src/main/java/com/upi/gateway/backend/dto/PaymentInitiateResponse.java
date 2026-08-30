@@ -23,7 +23,7 @@ public class PaymentInitiateResponse {
     private String message;
     private LocalDateTime createdAt;
     private String merchantTransactionId;
-    
+
     public static PaymentInitiateResponse from(Transaction transaction, String message) {
         return PaymentInitiateResponse.builder()
                 .transactionId(transaction.getId())

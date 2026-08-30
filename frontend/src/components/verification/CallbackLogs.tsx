@@ -37,7 +37,7 @@ export const CallbackLogs: React.FC<CallbackLogsProps> = ({ callbackLogs }) => {
 
   const formatResponseBody = (responseBody?: string) => {
     if (!responseBody) return 'No response';
-    
+
     try {
       const parsed = JSON.parse(responseBody);
       return JSON.stringify(parsed, null, 2);
@@ -61,7 +61,7 @@ export const CallbackLogs: React.FC<CallbackLogsProps> = ({ callbackLogs }) => {
   return (
     <Card className="p-6">
       <h3 className="text-lg font-semibold mb-4">Callback Logs</h3>
-      
+
       <div className="space-y-4">
         {callbackLogs.map((log) => (
           <div key={log.id} className="border border-gray-200 rounded-lg p-4">
@@ -77,7 +77,7 @@ export const CallbackLogs: React.FC<CallbackLogsProps> = ({ callbackLogs }) => {
                   </span>
                 )}
               </div>
-              
+
               <div className="text-xs text-gray-500">
                 {formatTimestamp(log.timestamp)}
               </div>

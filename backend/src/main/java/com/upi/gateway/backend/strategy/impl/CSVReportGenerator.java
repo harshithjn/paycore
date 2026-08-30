@@ -8,30 +8,25 @@ import org.springframework.stereotype.Component;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-/**
- * LSP Implementation: CSV Report Generator
- */
 @Component
 @Slf4j
 public class CSVReportGenerator implements ReportGenerator {
-    
+
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    
+
     @Override
     public boolean supports(String format) {
         return "CSV".equalsIgnoreCase(format);
     }
-    
+
     @Override
     public String generateReport(List<Settlement> settlements, Long merchantId) {
         log.info("Generating CSV report for merchant: {}", merchantId);
-        
+
         StringBuilder csv = new StringBuilder();
-        
-        // Header
+
         csv.append("Settlement ID,Merchant ID,Amount,Status,Type,Transaction Count,Period Start,Period End,Reference Number,Created At,Processed At\n");
-        
-        // Data rows
+
         for (Settlement settlement : settlements) {
             csv.append(settlement.getId()).append(",")
                .append(settlement.getMerchantId()).append(",")
@@ -46,10 +41,10 @@ public class CSVReportGenerator implements ReportGenerator {
                .append(settlement.getProcessedAt() != null ? settlement.getProcessedAt().format(DATE_FORMATTER) : "")
                .append("\n");
         }
-        
+
         return csv.toString();
     }
-    
+
     @Override
     public String getContentType() {
         return "text/csv";

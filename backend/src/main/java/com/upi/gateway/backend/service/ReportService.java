@@ -13,35 +13,33 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ReportService {
-    
+
     private final SettlementRepository settlementRepository;
     private final List<ReportGenerator> reportGenerators;
-    
+
     public String generateSettlementReport(Long merchantId, String format) {
         log.info("Generating {} report for merchant: {}", format, merchantId);
-        
-        // Select appropriate report generator (Strategy Pattern)
+
         ReportGenerator generator = reportGenerators.stream()
                 .filter(g -> g.supports(format))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unsupported report format: " + format));
-        
-        // Fetch settlements
+
         List<Settlement> settlements = settlementRepository.findByMerchantIdOrderByCreatedAtDesc(merchantId);
-        
+
         if (settlements.isEmpty()) {
             log.warn("No settlements found for merchant: {}", merchantId);
         }
-        
+
         return generator.generateReport(settlements, merchantId);
     }
-    
+
     public String getContentType(String format) {
         ReportGenerator generator = reportGenerators.stream()
                 .filter(g -> g.supports(format))
                 .findFirst()
                 .orElse(null);
-        
+
         return generator != null ? generator.getContentType() : "text/plain";
     }
 }

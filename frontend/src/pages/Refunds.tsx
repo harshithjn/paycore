@@ -20,7 +20,7 @@ export const Refunds = () => {
   const [remainingAmount, setRemainingAmount] = useState<number>(0);
   const [refundLoading, setRefundLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  
+
   const [refundForm, setRefundForm] = useState({
     amount: '',
     type: 'PARTIAL' as 'FULL' | 'PARTIAL',
@@ -29,10 +29,10 @@ export const Refunds = () => {
 
   const fetchTransactions = async () => {
     if (!merchantId) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const data = await transactionApi.getAll(Number(merchantId));
       const refundable = data.filter(t => t.status === 'SUCCESS' || t.status === 'SETTLED');
@@ -47,7 +47,7 @@ export const Refunds = () => {
   const openRefundModal = async (txn: Transaction) => {
     setSelectedTxn(txn);
     setRefundForm({ amount: txn.amount.toString(), type: 'FULL', reason: '' });
-    
+
     try {
       const [refundList, remaining] = await Promise.all([
         refundApi.getRefundsByTransaction(txn.id),
@@ -62,7 +62,7 @@ export const Refunds = () => {
 
   const handleRefund = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedTxn) return;
 
     setRefundLoading(true);
@@ -76,7 +76,7 @@ export const Refunds = () => {
       };
 
       const response = await refundApi.processRefund(request);
-      
+
       if (response.status === 'COMPLETED') {
         setToast({ message: 'Refund processed successfully', type: 'success' });
         setSelectedTxn(null);
@@ -85,9 +85,9 @@ export const Refunds = () => {
         setToast({ message: response.message || 'Refund failed', type: 'error' });
       }
     } catch (err) {
-      setToast({ 
-        message: err instanceof Error ? err.message : 'Failed to process refund', 
-        type: 'error' 
+      setToast({
+        message: err instanceof Error ? err.message : 'Failed to process refund',
+        type: 'error'
       });
     } finally {
       setRefundLoading(false);
@@ -127,8 +127,8 @@ export const Refunds = () => {
       <div className="card">
         {transactions.length === 0 ? (
           <div className="p-6">
-            <EmptyState 
-              title="No refundable transactions" 
+            <EmptyState
+              title="No refundable transactions"
               description="Only successful transactions can be refunded"
             />
           </div>
@@ -175,7 +175,6 @@ export const Refunds = () => {
         )}
       </div>
 
-      {/* Refund Modal */}
       {selectedTxn && (
         <div className="fixed inset-0 bg-black bg-opacity-30 z-50 flex items-center justify-center p-4">
           <div className="w-full max-w-lg bg-white dark:bg-[#111] rounded-lg shadow-2xl">

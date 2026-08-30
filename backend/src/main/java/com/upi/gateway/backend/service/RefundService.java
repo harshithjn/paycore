@@ -22,23 +22,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class RefundService {
-    
+
     private final TransactionRepository transactionRepository;
     private final RefundRepository refundRepository;
     private final List<RefundProcessor> refundProcessors;
     private final RefundManager refundManager;
-    
+
     @Transactional
     public RefundResponse processRefund(RefundRequest request) {
         log.info("Processing refund request: {}", request);
-        
-        // 1. Fetch transaction
+
         Transaction transaction = transactionRepository.findById(request.getTransactionId())
                 .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + request.getTransactionId()));
-        
+
         BigDecimal refundAmount = BigDecimal.valueOf(request.getAmount());
-        
-        // 2. Validate refund using Singleton manager
+
         if (!refundManager.validateRefund(transaction, refundAmount)) {
             return RefundResponse.builder()
                     .transactionId(transaction.getId())
@@ -47,32 +45,27 @@ public class RefundService {
                     .message("Refund validation failed")
                     .build();
         }
-        
-        // 3. Select appropriate processor (Strategy Pattern)
+
         RefundProcessor processor = refundProcessors.stream()
                 .filter(p -> p.supports(request.getType()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unsupported refund type: " + request.getType()));
-        
-        // 4. Process refund
+
         Refund refund = processor.processRefund(transaction, refundAmount, request.getReason());
-        
-        // 5. Save refund record
+
         Refund savedRefund = refundRepository.save(refund);
-        
-        // 6. Update transaction status and total refunded
+
         BigDecimal newTotalRefunded = transaction.getTotalRefunded().add(refundAmount);
         transaction.setTotalRefunded(newTotalRefunded);
-        
-        // If fully refunded, update status
+
         if (refundManager.isFullyRefunded(transaction)) {
             transaction.setStatus(Transaction.TransactionStatus.REFUNDED);
         }
-        
+
         transactionRepository.save(transaction);
-        
+
         log.info("Refund processed successfully: {}", savedRefund.getId());
-        
+
         return RefundResponse.builder()
                 .refundId(savedRefund.getId())
                 .transactionId(savedRefund.getTransactionId())
@@ -85,22 +78,22 @@ public class RefundService {
                 .message("Refund processed successfully")
                 .build();
     }
-    
+
     public List<RefundResponse> getRefundsByTransaction(UUID transactionId) {
         List<Refund> refunds = refundRepository.findByTransactionIdOrderByCreatedAtDesc(transactionId);
-        
+
         return refunds.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
-    
+
     public BigDecimal getRemainingRefundableAmount(UUID transactionId) {
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + transactionId));
-        
+
         return refundManager.getRemainingRefundableAmount(transaction);
     }
-    
+
     private RefundResponse mapToResponse(Refund refund) {
         return RefundResponse.builder()
                 .refundId(refund.getId())

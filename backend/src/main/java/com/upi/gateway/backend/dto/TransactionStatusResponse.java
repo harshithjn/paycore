@@ -27,7 +27,7 @@ public class TransactionStatusResponse {
     private String upiTransactionId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    
+
     public static TransactionStatusResponse from(Transaction transaction) {
         return TransactionStatusResponse.builder()
                 .id(transaction.getId())

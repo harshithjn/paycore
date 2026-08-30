@@ -1,15 +1,15 @@
 import React from 'react';
 import { NavLink, useParams } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  CreditCard, 
-  ArrowUpDown, 
-  RotateCcw, 
-  Banknote, 
-  BarChart3, 
-  Key, 
-  Settings, 
-  User, 
+import {
+  LayoutDashboard,
+  CreditCard,
+  ArrowUpDown,
+  RotateCcw,
+  Banknote,
+  BarChart3,
+  Key,
+  Settings,
+  User,
   LogOut,
   Zap
 } from 'lucide-react';
@@ -31,7 +31,6 @@ export const Sidebar: React.FC = () => {
 
   return (
     <div className="flex h-screen w-64 flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700">
-      {/* Logo */}
       <div className="flex h-16 items-center px-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center space-x-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600">
@@ -43,7 +42,6 @@ export const Sidebar: React.FC = () => {
         </div>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 space-y-1 px-3 py-4">
         {navigation.map((item) => {
           const href = `/merchant/${merchantId}/${item.href}`;
@@ -67,7 +65,6 @@ export const Sidebar: React.FC = () => {
         })}
       </nav>
 
-      {/* Bottom section */}
       <div className="border-t border-gray-200 dark:border-gray-700 p-3">
         <div className="flex items-center px-3 py-2 text-sm text-gray-700 dark:text-gray-300">
           <User className="mr-3 h-5 w-5" />

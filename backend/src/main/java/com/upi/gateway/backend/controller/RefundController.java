@@ -18,24 +18,20 @@ import java.util.UUID;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
 public class RefundController {
-    
+
     private final RefundService refundService;
-    
-    /**
-     * POST /api/refund - Process a refund request
-     */
+
     @PostMapping("/refund")
     public ResponseEntity<?> processRefund(@Valid @RequestBody RefundRequest request) {
         try {
             log.info("Received refund request for transaction: {}", request.getTransactionId());
             RefundResponse response = refundService.processRefund(request);
-            
+
             if ("FAILED".equals(response.getStatus())) {
                 return ResponseEntity.badRequest().body(response);
             }
-            
+
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             log.error("Refund validation error: {}", e.getMessage());
@@ -55,25 +51,19 @@ public class RefundController {
             );
         }
     }
-    
-    /**
-     * GET /api/refunds?transactionId={id} - Get refunds for a transaction
-     */
+
     @GetMapping("/refunds")
     public ResponseEntity<List<RefundResponse>> getRefunds(
             @RequestParam(required = false) UUID transactionId) {
-        
+
         if (transactionId != null) {
             List<RefundResponse> refunds = refundService.getRefundsByTransaction(transactionId);
             return ResponseEntity.ok(refunds);
         }
-        
+
         return ResponseEntity.badRequest().build();
     }
-    
-    /**
-     * GET /api/refunds/remaining/{transactionId} - Get remaining refundable amount
-     */
+
     @GetMapping("/refunds/remaining/{transactionId}")
     public ResponseEntity<?> getRemainingRefundableAmount(@PathVariable UUID transactionId) {
         try {
@@ -83,7 +73,6 @@ public class RefundController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    
-    // Inner DTO for remaining amount response
+
     private record RemainingAmountResponse(UUID transactionId, Double remainingAmount) {}
 }

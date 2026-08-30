@@ -6,7 +6,7 @@ import { useMerchant } from '../context/MerchantContext';
 export const Settings = () => {
   const { merchant, updateMerchant } = useMerchant();
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  
+
   const [settings, setSettings] = useState({
     businessName: merchant?.businessName || merchant?.name || '',
     email: merchant?.email || '',
@@ -39,10 +39,9 @@ export const Settings = () => {
 
       <div className="max-w-3xl">
         <form onSubmit={handleSave} className="space-y-6">
-          {/* Business Information */}
           <div className="card p-6">
             <h2 className="text-lg font-medium text-[#111] dark:text-[#EAEAEA] mb-4">Business Information</h2>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm text-[#6B7280] mb-2">Business Name</label>
@@ -76,10 +75,9 @@ export const Settings = () => {
             </div>
           </div>
 
-          {/* Settlement Preferences */}
           <div className="card p-6">
             <h2 className="text-lg font-medium text-[#111] dark:text-[#EAEAEA] mb-4">Settlement Preferences</h2>
-            
+
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>

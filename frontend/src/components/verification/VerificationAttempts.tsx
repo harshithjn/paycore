@@ -7,8 +7,8 @@ interface VerificationAttemptsProps {
   verificationAttempts: VerificationAttempt[];
 }
 
-export const VerificationAttempts: React.FC<VerificationAttemptsProps> = ({ 
-  verificationAttempts 
+export const VerificationAttempts: React.FC<VerificationAttemptsProps> = ({
+  verificationAttempts
 }) => {
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -70,7 +70,7 @@ export const VerificationAttempts: React.FC<VerificationAttemptsProps> = ({
   return (
     <Card className="p-6">
       <h3 className="text-lg font-semibold mb-4">Verification Attempts</h3>
-      
+
       <div className="space-y-4">
         {verificationAttempts.map((attempt, index) => (
           <div key={attempt.id} className="border border-gray-200 rounded-lg p-4">
@@ -89,7 +89,7 @@ export const VerificationAttempts: React.FC<VerificationAttemptsProps> = ({
                   </span>
                 </div>
               </div>
-              
+
               <div className="text-xs text-gray-500">
                 Attempt #{verificationAttempts.length - index}
               </div>

@@ -12,11 +12,11 @@ import java.util.UUID;
 
 @Repository
 public interface RefundRepository extends JpaRepository<Refund, UUID> {
-    
+
     List<Refund> findByTransactionIdOrderByCreatedAtDesc(UUID transactionId);
-    
+
     @Query("SELECT COALESCE(SUM(r.amount), 0) FROM Refund r WHERE r.transactionId = :transactionId AND r.status = 'COMPLETED'")
     BigDecimal getTotalRefundedAmount(@Param("transactionId") UUID transactionId);
-    
+
     List<Refund> findByStatusOrderByCreatedAtDesc(Refund.RefundStatus status);
 }

@@ -17,30 +17,30 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class CallbackLog {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-    
+
     @Column(name = "transaction_id", nullable = false)
     private UUID transactionId;
-    
+
     @Column(name = "status_sent", nullable = false)
     private String statusSent;
-    
+
     @Column(name = "callback_url")
     private String callbackUrl;
-    
+
     @Column(name = "response_code")
     private Integer responseCode;
-    
+
     @Column(name = "response_body", columnDefinition = "TEXT")
     private String responseBody;
-    
+
     @Column(name = "retry_count")
     @Builder.Default
     private Integer retryCount = 0;
-    
+
     @CreationTimestamp
     @Column(name = "timestamp")
     private LocalDateTime timestamp;

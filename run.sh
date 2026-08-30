@@ -65,18 +65,10 @@ setup() {
     check_dependency "java" "Java 17+"
     check_dependency "mvn" "Maven"
 
-    setup_service "payment-service" "Payment Service"
     setup_service "frontend" "Frontend UI"
 
     print_info "Building Spring Boot Backend..."
     (cd backend && ./mvnw clean compile)
-
-    if [ -d "payment-service" ] && [ ! -f "payment-service/.env" ]; then
-        if [ -f "payment-service/.env.example" ]; then
-            cp "payment-service/.env.example" "payment-service/.env"
-            print_warning "Please update payment-service/.env with your credentials."
-        fi
-    fi
 
     print_success "Setup completed successfully."
 }
@@ -86,11 +78,6 @@ run() {
 
     print_info "Starting Spring Boot Backend (Port 8081)..."
     (cd backend && ./mvnw spring-boot:run) &
-
-    if [ -d "payment-service" ]; then
-        print_info "Starting Node.js Payment Service (Port 3001)..."
-        (cd payment-service && npm start) &
-    fi
 
     print_info "Starting React Frontend (Port 5173)..."
     (cd frontend && npm run dev) &
@@ -104,10 +91,6 @@ run() {
     echo "=============================="
     echo "Frontend:             http://localhost:5173"
     echo "Backend API:          http://localhost:8081"
-    echo "H2 Database Console:  http://localhost:8081/h2-console"
-    if [ -d "payment-service" ]; then
-        echo "Payment Service API:  http://localhost:3001"
-    fi
     echo "=============================="
     echo ""
     print_warning "Press Ctrl+C to terminate all processes."

@@ -152,7 +152,6 @@ export const TransactionStatus: React.FC<TransactionStatusProps> = ({ transactio
         )}
       </div>
 
-      {/* Transaction Lifecycle Visualization */}
       <div className="mt-6 pt-6 border-t">
         <h4 className="text-sm font-medium text-gray-700 mb-3">Transaction Lifecycle</h4>
         <div className="flex items-center space-x-2">
@@ -160,7 +159,7 @@ export const TransactionStatus: React.FC<TransactionStatusProps> = ({ transactio
             const isActive = transaction.status === status;
             const isPassed = ['CREATED', 'INITIATED', 'PROCESSING'].indexOf(transaction.status) > index;
             const isFailed = transaction.status === 'FAILED' && index <= 2;
-            
+
             return (
               <React.Fragment key={status}>
                 <div

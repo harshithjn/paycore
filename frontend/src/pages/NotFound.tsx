@@ -16,22 +16,22 @@ export const NotFound: React.FC = () => {
             <h2 className="text-2xl font-medium text-[#111] dark:text-[#EAEAEA]">Page Not Found</h2>
           </div>
         </div>
-        
+
         <p className="text-[#6B7280] mb-10 leading-relaxed">
-          The link you followed might be broken, or the page may have been removed. 
+          The link you followed might be broken, or the page may have been removed.
           Check the URL or return to safety.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => navigate(-1)}
             className="flex items-center gap-2"
           >
             <ArrowLeft size={18} />
             Go Back
           </Button>
-          <Button 
+          <Button
             onClick={() => navigate('/')}
             className="flex items-center gap-2"
           >

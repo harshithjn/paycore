@@ -16,7 +16,7 @@ public class PaymentResult {
     private String message;
     private String transactionId;
     private String failureReason;
-    
+
     public static PaymentResult success(String transactionId, String message) {
         return PaymentResult.builder()
                 .success(true)
@@ -25,7 +25,7 @@ public class PaymentResult {
                 .message(message)
                 .build();
     }
-    
+
     public static PaymentResult failure(String reason) {
         return PaymentResult.builder()
                 .success(false)
@@ -34,7 +34,7 @@ public class PaymentResult {
                 .message("Payment failed: " + reason)
                 .build();
     }
-    
+
     public static PaymentResult processing(String message) {
         return PaymentResult.builder()
                 .success(true)

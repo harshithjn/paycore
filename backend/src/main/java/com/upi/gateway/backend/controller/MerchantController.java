@@ -21,7 +21,6 @@ import java.util.Optional;
 @RequestMapping("/api/merchant")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
 public class MerchantController {
 
     private final MerchantService merchantService;
@@ -39,32 +38,26 @@ public class MerchantController {
     public MerchantLoginResponse login(@Valid @RequestBody MerchantLoginRequest request) {
         return merchantService.login(request);
     }
-    
-    /**
-     * Get merchant details including webhook URL
-     */
+
     @GetMapping("/{merchantId}")
     public ResponseEntity<Merchant> getMerchant(@PathVariable Long merchantId) {
         log.info("Fetching merchant details for ID: {}", merchantId);
-        
+
         Optional<Merchant> merchant = merchantService.findById(merchantId);
         return merchant.map(ResponseEntity::ok)
                       .orElse(ResponseEntity.notFound().build());
     }
-    
-    /**
-     * Update merchant webhook URL
-     */
+
     @PutMapping("/{merchantId}/webhook")
     public ResponseEntity<Map<String, String>> updateWebhookUrl(
             @PathVariable Long merchantId,
             @RequestBody Map<String, String> request) {
-        
+
         log.info("Updating webhook URL for merchant: {}", merchantId);
-        
+
         String webhookUrl = request.get("webhookUrl");
         boolean updated = merchantService.updateWebhookUrl(merchantId, webhookUrl);
-        
+
         if (updated) {
             return ResponseEntity.ok(Map.of(
                 "message", "Webhook URL updated successfully",
@@ -74,14 +67,11 @@ public class MerchantController {
             return ResponseEntity.notFound().build();
         }
     }
-    
-    /**
-     * Get merchant webhook URL
-     */
+
     @GetMapping("/{merchantId}/webhook")
     public ResponseEntity<Map<String, String>> getWebhookUrl(@PathVariable Long merchantId) {
         log.info("Fetching webhook URL for merchant: {}", merchantId);
-        
+
         Optional<Merchant> merchant = merchantService.findById(merchantId);
         if (merchant.isPresent()) {
             return ResponseEntity.ok(Map.of(
@@ -92,10 +82,6 @@ public class MerchantController {
         }
     }
 
-    /**
-     * GET /api/merchant/{merchantId}/settings
-     * Get merchant settings
-     */
     @GetMapping("/{merchantId}/settings")
     public ResponseEntity<?> getSettings(@PathVariable Long merchantId) {
         try {
@@ -106,10 +92,6 @@ public class MerchantController {
         }
     }
 
-    /**
-     * PUT /api/merchant/{merchantId}/settings
-     * Update merchant settings
-     */
     @PutMapping("/{merchantId}/settings")
     public ResponseEntity<?> updateSettings(
             @PathVariable Long merchantId,
@@ -122,10 +104,6 @@ public class MerchantController {
         }
     }
 
-    /**
-     * POST /api/merchant/{merchantId}/regenerate-key
-     * Regenerate the merchant's API key
-     */
     @PostMapping("/{merchantId}/regenerate-key")
     public ResponseEntity<?> regenerateApiKey(@PathVariable Long merchantId) {
         try {

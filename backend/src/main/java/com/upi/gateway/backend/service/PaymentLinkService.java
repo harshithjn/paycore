@@ -21,8 +21,8 @@ import java.util.UUID;
 public class PaymentLinkService {
 
     private final PaymentLinkRepository paymentLinkRepository;
-    private final TransactionRepository transactionRepository; 
-    private final ApiRequestLogRepository apiRequestLogRepository; 
+    private final TransactionRepository transactionRepository;
+    private final ApiRequestLogRepository apiRequestLogRepository;
 
     public PaymentLink createLink(Long merchantId, String title, String description, BigDecimal amount, boolean isReusable) {
         String linkCode = "pl_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
@@ -63,7 +63,6 @@ public class PaymentLinkService {
             throw new RuntimeException("This payment link has already been used");
         }
 
-        // Create the transaction
         Transaction transaction = Transaction.builder()
                 .merchantId(link.getMerchantId())
                 .amount(link.getAmount())
@@ -76,12 +75,10 @@ public class PaymentLinkService {
 
         Transaction saved = transactionRepository.save(transaction);
 
-        // Simulate payment processing — mark as SUCCESS
         saved.setStatus(Transaction.TransactionStatus.SUCCESS);
         saved.setPaymentMethod(paymentMethod != null ? paymentMethod.toUpperCase() : "LINK");
         transactionRepository.save(saved);
 
-        // Update link counters
         link.setPaymentCount(link.getPaymentCount() + 1);
         link.setTotalCollected(link.getTotalCollected().add(link.getAmount()));
         paymentLinkRepository.save(link);
@@ -107,7 +104,6 @@ public class PaymentLinkService {
         return paymentLinkRepository.save(link);
     }
 
-    // API Logging
     public void logApiRequest(Long merchantId, String apiKey, String method, String endpoint,
                                Integer statusCode, String requestBody, String responseSummary, String ipAddress) {
         ApiRequestLog logEntry = ApiRequestLog.builder()

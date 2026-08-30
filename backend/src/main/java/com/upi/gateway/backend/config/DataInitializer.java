@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Order(1)
 public class DataInitializer implements CommandLineRunner {
-    
+
     @Override
     public void run(String... args) {
         log.info("Application started. No sample data seeded.");

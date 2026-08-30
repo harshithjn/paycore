@@ -8,9 +8,9 @@ import { Button } from '../components/ui/Button';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { Toast } from '../components/ui/Toast';
 import type { Transaction } from '../types';
-import { 
-  RefreshCw, 
-  Search, 
+import {
+  RefreshCw,
+  Search,
   Eye,
   Shield,
   CreditCard,
@@ -23,7 +23,7 @@ import {
 export const TransactionVerification = () => {
   const { merchantId } = useParams<{ merchantId: string }>();
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
-  
+
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +45,7 @@ export const TransactionVerification = () => {
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
-    
+
     if (autoRefresh) {
       interval = setInterval(() => {
         loadTransactions();

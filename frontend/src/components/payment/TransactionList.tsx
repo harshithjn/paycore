@@ -55,7 +55,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       <div className="px-6 py-4 border-b border-gray-200">
         <h3 className="text-lg font-semibold">Recent Transactions</h3>
       </div>
-      
+
       <div className="divide-y divide-gray-200">
         {transactions.map((transaction) => (
           <div
@@ -78,7 +78,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                   {formatDate(transaction.createdAt)}
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-4">
                 <div className="text-right">
                   <div className="text-sm font-semibold text-gray-900">
@@ -93,7 +93,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                 <StatusBadge status={transaction.status.toLowerCase() as any} />
               </div>
             </div>
-            
+
             {transaction.failureReason && (
               <div className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded">
                 {transaction.failureReason}

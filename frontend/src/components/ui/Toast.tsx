@@ -19,8 +19,8 @@ export const Toast = ({ message, type, duration = 3000, onClose }: ToastProps) =
     return () => clearTimeout(timer);
   }, [duration, onClose]);
 
-  const bgColor = type === 'success' 
-    ? 'bg-[#ECFDF5] dark:bg-[#064E3B] border-[#059669]' 
+  const bgColor = type === 'success'
+    ? 'bg-[#ECFDF5] dark:bg-[#064E3B] border-[#059669]'
     : type === 'error'
     ? 'bg-[#FEF2F2] dark:bg-[#7F1D1D] border-[#DC2626]'
     : 'bg-white dark:bg-[#1A1A1A] border-[#E5E7EB] dark:border-[#2A2A2A]';

@@ -45,7 +45,6 @@ export const settlementApi = {
     return response.data;
   },
 
-  // Admin APIs
   getAllSettlements: async (): Promise<SettlementResponse[]> => {
     const response = await apiClient.get('/api/admin/settlements');
     return response.data;

@@ -18,10 +18,10 @@ export const Settlements = () => {
 
   const fetchSettlements = async () => {
     if (!merchantId) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const data = await settlementApi.getByMerchant(Number(merchantId));
       setSettlements(data);
@@ -44,7 +44,7 @@ export const Settlements = () => {
       };
 
       const response = await settlementApi.processSettlement(request);
-      
+
       if (response.status === 'COMPLETED') {
         setToast({ message: `${type} settlement processed successfully`, type: 'success' });
         fetchSettlements();
@@ -52,9 +52,9 @@ export const Settlements = () => {
         setToast({ message: response.message || 'Settlement failed', type: 'error' });
       }
     } catch (err) {
-      setToast({ 
-        message: err instanceof Error ? err.message : 'Failed to process settlement', 
-        type: 'error' 
+      setToast({
+        message: err instanceof Error ? err.message : 'Failed to process settlement',
+        type: 'error'
       });
     } finally {
       setProcessing(false);
@@ -74,12 +74,12 @@ export const Settlements = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      
+
       setToast({ message: 'Report downloaded successfully', type: 'success' });
     } catch (err) {
-      setToast({ 
-        message: err instanceof Error ? err.message : 'Failed to download report', 
-        type: 'error' 
+      setToast({
+        message: err instanceof Error ? err.message : 'Failed to download report',
+        type: 'error'
       });
     }
   };
@@ -118,7 +118,7 @@ export const Settlements = () => {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-medium text-[#111] dark:text-[#EAEAEA]">Settlements</h1>
-        
+
         <div className="flex gap-3">
           <button
             onClick={() => downloadReport('CSV')}
@@ -137,7 +137,6 @@ export const Settlements = () => {
         </div>
       </div>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="card p-6">
           <div className="text-sm text-[#6B7280] mb-2">Total Settled</div>
@@ -176,12 +175,11 @@ export const Settlements = () => {
         </div>
       </div>
 
-      {/* Settlements Table */}
       <div className="card">
         {settlements.length === 0 ? (
           <div className="p-6">
-            <EmptyState 
-              title="No settlements yet" 
+            <EmptyState
+              title="No settlements yet"
               description="Settlements will appear here once processed"
             />
           </div>

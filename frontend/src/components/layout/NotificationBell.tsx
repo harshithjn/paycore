@@ -22,7 +22,7 @@ export const NotificationBell = () => {
 
   return (
     <div className="relative">
-      <button 
+      <button
         onClick={toggleDropdown}
         className="p-2 hover:bg-[#F9FAFB] dark:hover:bg-[#1A1A1A] rounded-lg transition-colors duration-150 relative"
       >
@@ -37,7 +37,7 @@ export const NotificationBell = () => {
           <div className="p-4 border-b border-[#E5E7EB] dark:border-[#2A2A2A] flex items-center justify-between bg-[#FAFAFA] dark:bg-[#0B0B0C]">
             <h3 className="text-sm font-semibold text-[#111] dark:text-[#EAEAEA]">Notifications</h3>
             {notifications.length > 0 && (
-              <button 
+              <button
                 onClick={(e) => { e.stopPropagation(); clearNotifications(); setIsOpen(false); }}
                 className="text-xs text-[#4F46E5] hover:text-[#4338CA] transition-colors"
               >
@@ -45,7 +45,7 @@ export const NotificationBell = () => {
               </button>
             )}
           </div>
-          
+
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
               <div className="p-8 text-center text-sm text-[#6B7280]">

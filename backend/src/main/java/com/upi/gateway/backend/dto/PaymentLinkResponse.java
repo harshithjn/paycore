@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentLinkResponse {
-    
+
     private UUID transactionId;
     private String paymentLink;
     private String qrCodeData;
